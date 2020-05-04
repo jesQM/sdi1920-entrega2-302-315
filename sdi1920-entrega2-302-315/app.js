@@ -28,6 +28,7 @@ app.set('crypto',crypto);
 // ROUTES \\
 
 require("./routes/rusuarios.js")(app, swig, gestorBD);
+require("./routes/rfriends")(app, swig, gestorBD);
 
 app.get("/", function(req, res) {
     let respuesta = swig.renderFile('views/bhome.html', {user : req.session.usuario});
