@@ -8,6 +8,10 @@ module.exports = function(app, swig, gestorBD) {
         let criterio = {
             email : req.session.usuario,
         };
+        let pg = parseInt(req.query.pg); // Es String !!!
+        if ( req.query.pg == null){ // Puede no venir el param
+            pg = 1;
+        }
         gestorBD.obtenerUsuarios( criterio, (users) => {
             if (users && users[0]){
                 let myself = users[0];
@@ -16,12 +20,23 @@ module.exports = function(app, swig, gestorBD) {
                 };
                 gestorBD.obtenerFriendship(criterio2, (requests) => {
                     if (requests) {
-                        // requests.map( r => t.userFrom );
-                        getAllUsersFromId( requests.map( r => r.userFrom ), (users) => {
-
+                        getAllUsersFromIdPag( requests.filter( r => !r.accepted).map( r => r.userFrom ), pg ,(users, total) => {
                             if (users) {
+                                let ultimaPg = total/4;
+                                if (total % 4 > 0 ){ // Sobran decimales
+                                    ultimaPg = ultimaPg+1;
+                                }
+                                let paginas = []; // paginas mostrar
+                                for(let i = pg-2 ; i <= pg+2 ; i++){
+                                    if ( i > 0 && i <= ultimaPg){
+                                        paginas.push(i);
+                                    }
+                                }
+
                                 let respuesta = swig.renderFile('views/bpeticionesAmistad.html', {
-                                    users : users
+                                    users : users,
+                                    paginas : paginas,
+                                    actual : pg
                                 });
                                 res.send(respuesta);
                             } else {
@@ -39,14 +54,14 @@ module.exports = function(app, swig, gestorBD) {
         });
     });
 
-    function getAllUsersFromId( arrayOfIDs, callback ){
+    function getAllUsersFromIdPag( arrayOfIDs, pg, callback ){
         if (arrayOfIDs.length == 0) {
             callback([]);
         } else {
             let criterio = {
                 $or : arrayOfIDs.map( (identifier) => {return { _id : gestorBD.mongo.ObjectID(identifier.toString())}} )
             }
-            gestorBD.obtenerUsuarios(criterio, callback);
+            gestorBD.obtenerUsuariosPag(criterio, pg, callback);
         }
     }
 
@@ -95,7 +110,7 @@ module.exports = function(app, swig, gestorBD) {
         }
     });
 
-    app.get("/friends/request/accept/:id", function(req, res) {
+    app.get("/friends/request/accept/:friendId", function(req, res) {
         res.send("accept friend request");
     });
 };

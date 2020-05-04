@@ -39,6 +39,26 @@ module.exports = {
             }
         });
     },
+    obtenerUsuariosPag : function(criterio,pg,funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('users');
+                collection.count(function(err, count){ // TODO; Repair order of operations
+                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
+                        .toArray(function(err, canciones) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(canciones, count);
+                            }
+                            db.close();
+                        });
+                });
+            }
+        });
+    },
 
     insertarFriendship : function(friendship, funcionCallback){
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
