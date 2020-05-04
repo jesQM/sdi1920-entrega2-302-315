@@ -8,7 +8,7 @@ module.exports = function(app, swig, gestorBD) {
         res.send("see friend requests");
     });
 
-    app.get("/friends/request/send/:email", function(req, res) {
+    app.get("/friends/request/send/:id", function(req, res) {
         res.send("send friend request");
     });
 
