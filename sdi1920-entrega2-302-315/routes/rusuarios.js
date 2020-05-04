@@ -8,8 +8,33 @@ module.exports = function(app, swig, gestorBD) {
         res.send(respuesta);
     });
 
+    app.get("/identificarse", function(req, res) {
+        let respuesta = swig.renderFile('views/bidentificacion.html', {});
+        res.send(respuesta);
+    });
+
+    app.post("/identificarse", function(req, res) {
+        let seguro = app.get("crypto").createHmac('sha256', app.get('clave'))
+            .update(req.body.password).digest('hex');
+        let criterio = {
+            email : req.body.email,
+            password : seguro
+        }
+        gestorBD.obtenerUsuarios(criterio, function(usuarios) {
+            if (usuarios == null || usuarios.length == 0) {
+                req.session.usuario = null;
+                res.redirect("/identificarse" +
+                    "?mensaje=Email o password incorrecto"+
+                    "&tipoMensaje=alert-danger ");
+            } else {
+                req.session.usuario = usuarios[0].email;
+                res.redirect("/usuarios");
+            }
+        });
+    });
+
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
-        res.send("Usuario desconectado");
-    })
+        res.redirect("/");
+    });
 };
