@@ -22,10 +22,15 @@ app.set('db','mongodb://admin:sdi_Iz9@tiendamusica-shard-00-00-xmbgc.mongodb.net
 app.set('clave','abcdefg');
 app.set('crypto',crypto);
 
+// ROUTERS \\
+
+
+// ROUTES \\
+
 require("./routes/rusuarios.js")(app, swig, gestorBD);
 
 app.get("/", function(req, res) {
-    let respuesta = swig.renderFile('views/base.html', {});
+    let respuesta = swig.renderFile('views/bhome.html', {user : req.session.usuario});
     res.send(respuesta);
 });
 

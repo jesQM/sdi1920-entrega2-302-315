@@ -37,4 +37,13 @@ module.exports = function(app, swig, gestorBD) {
         req.session.usuario = null;
         res.redirect("/");
     });
+
+    app.get('/whoami',function(req,res){
+        if(req.session && req.session.usuario){
+            res.send(req.session.usuario);
+        }
+        else{
+            res.send(null);
+        }
+    });
 };
