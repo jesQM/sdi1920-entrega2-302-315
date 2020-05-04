@@ -1,0 +1,15 @@
+module.exports = function(app, swig, gestorBD) {
+    app.get("/usuarios", function(req, res) {
+        res.send("ver usuarios");
+    });
+
+    app.get("/registrarse", function(req, res) {
+        let respuesta = swig.renderFile('views/bregistro.html', {});
+        res.send(respuesta);
+    });
+
+    app.get('/desconectarse', function (req, res) {
+        req.session.usuario = null;
+        res.send("Usuario desconectado");
+    })
+};
