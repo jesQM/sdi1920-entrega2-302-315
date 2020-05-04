@@ -17,6 +17,7 @@ import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
+import com.uniovi.tests.util.SeleniumUtils;
 
 
 //Ordenamos las pruebas por el nombre del mÃ©todo
@@ -96,7 +97,7 @@ public class TestsJesus {
 		
 		// The error is showned
 		PO_View.checkElement(driver, "class", "alert");
-	}	
+	}
 	
 	// [Prueba8] Inicio de sesión con datos inválidos (usuario estándar, email no existente y contraseña no vacía).
 	@Test
@@ -111,17 +112,24 @@ public class TestsJesus {
 		
 		// The error is showned
 		PO_View.checkElement(driver, "class", "alert");
-	}	
+	}
 	
-	//PR09. Sin hacer /
+	// [Prueba9] Hacer click en la opción de salir de sesión y comprobar que se redirige a la página de inicio de sesión (Login).
 	@Test
 	public void PR09() {
-		assertTrue("PR09 sin hacer", false);			
-	}	
-	//PR10. Sin hacer /
+		// First, login
+		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
+		PO_LoginView.fillForm(driver, "admin@email.com", "a");
+		
+		// Then logout
+		PO_HomeView.clickOption(driver, "desconectarse", "class", "form-horizontal");
+		PO_View.checkElement(driver, "text", "Identificación de usuario");
+	}
+
+	// [Prueba10] Comprobar que el botón cerrar sesión no está visible si el usuario no está autenticado.
 	@Test
 	public void PR10() {
-		assertTrue("PR10 sin hacer", false);			
+		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, " Desconectar", 2);
 	}	
 	
 	//PR11. Sin hacer /

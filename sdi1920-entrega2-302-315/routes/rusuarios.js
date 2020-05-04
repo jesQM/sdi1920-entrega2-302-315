@@ -35,7 +35,7 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get('/desconectarse', function (req, res) {
         req.session.usuario = null;
-        res.redirect("/");
+        res.redirect("/identificarse");
     });
 
     app.get('/whoami',function(req,res){
