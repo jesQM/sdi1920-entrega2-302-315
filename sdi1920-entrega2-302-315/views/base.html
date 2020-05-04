@@ -23,35 +23,40 @@
       </button>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li id="mUsuarios" class="btn"><a href="/usuarios">Lista de Usuarios</a></li>
+      <ul id="mNavBar" class="nav navbar-nav">
+        <li id="mUsuarios" class="btn"></li>
 
-        <li id="mAmigos" class="btn"><a class="btn" type="button" data-toggle="dropdown">Amigos <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="/friends/list">Ver amigos</a></li>
-            <li><a href="/friends/request">Peticiones de Amistad</a></li>
-          </ul>
-        <div class="dropdown">
-        </div>
+        <li id="mAmigos" class="btn">
         </li>
       </ul>
       <ul id="navSessionMenu" class="nav navbar-nav navbar-right">
-        <script>
-          $.ajax({url: "/whoami", success: function(result){
-            if (result) {
-              $("#navSessionMenu").html("<li><a href=\"/desconectarse\"><span class=\"glyphicon glyphicon-off\"></span> Desconectar</a></li>");
-            } else {
-              $("#navSessionMenu").html(
-                "<li><a href=\"/registrarse\"><span class=\"glyphicon glyphicon-user\"></span> Registrate</a></li>" +
-                "<li><a href=\"/identificarse\"><span class=\"glyphicon glyphicon-log-in\"></span> Identifícate</a></li>"
-              );
-            }
-          }});
-        </script>
+        <!-- Logout menus -->
       </ul>
     </div>
   </div>
 </nav>
+
+<script>
+  $.ajax({url: "/whoami", success: function(result){
+      if (result) {
+        // We have a session
+        $("#mUsuarios").html("<a href=\"/usuarios\">Lista de Usuarios</a>");
+        $("#mAmigos").html("<a class=\"btn\" type=\"button\" data-toggle=\"dropdown\">Amigos <span class=\"caret\"></span></a>\n" +
+                "          <ul class=\"dropdown-menu\">\n" +
+                "            <li><a href=\"/friends/list\">Ver amigos</a></li>\n" +
+                "            <li><a href=\"/friends/request\">Peticiones de Amistad</a></li>\n" +
+                "          </ul>\n" +
+                "          <div class=\"dropdown\">\n" +
+                "          </div>");
+        $("#navSessionMenu").html("<li><a href=\"/desconectarse\"><span class=\"glyphicon glyphicon-off\"></span> Desconectar</a></li>");
+      } else {
+        $("#navSessionMenu").html(
+                "<li><a href=\"/registrarse\"><span class=\"glyphicon glyphicon-user\"></span> Registrate</a></li>" +
+                "<li><a href=\"/identificarse\"><span class=\"glyphicon glyphicon-log-in\"></span> Identifícate</a></li>"
+        );
+      }
+    }});
+</script>
 
 <div class="container">
   <script>
