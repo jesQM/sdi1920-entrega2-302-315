@@ -1,6 +1,8 @@
 package com.uniovi.tests;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 //Paquetes JUnit 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -9,8 +11,10 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.openqa.selenium.By;
 //Paquetes Selenium 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.uniovi.tests.pageobjects.PO_HomeView;
@@ -130,31 +134,7 @@ public class TestsJesus {
 	@Test
 	public void PR10() {
 		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, " Desconectar", 2);
-	}	
-	
-	//PR11. Sin hacer /
-	@Test
-	public void PR11() {
-		assertTrue("PR11 sin hacer", false);			
-	}	
-	
-	//PR12. Sin hacer /
-	@Test
-	public void PR12() {
-		assertTrue("PR12 sin hacer", false);			
-	}	
-	
-	//PR13. Sin hacer /
-	@Test
-	public void PR13() {
-		assertTrue("PR13 sin hacer", false);			
-	}	
-	
-	//PR14. Sin hacer /
-	@Test
-	public void PR14() {
-		assertTrue("PR14 sin hacer", false);			
-	}	
+	}
 	
 	//PR15. Sin hacer /
 	@Test
@@ -168,10 +148,18 @@ public class TestsJesus {
 		assertTrue("PR16 sin hacer", false);			
 	}	
 	
-	//PR017. Sin hacer /
+	// [Prueba17] Mostrar el listado de invitaciones de amistad recibidas. Comprobar con un listado que contenga varias invitaciones recibidas.
 	@Test
 	public void PR17() {
-		assertTrue("PR17 sin hacer", false);			
+		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
+		PO_LoginView.fillForm(driver, "admin@email.com", "a");
+		
+		
+		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"mAmigos\"]/a", 2);
+		e.get(0).click();
+		PO_HomeView.clickOption(driver, "friends/request", "class", "table-responsive");
+		e = driver.findElements(By.xpath("tr"));
+		assertTrue(e.size() != 0);
 	}	
 	
 	//PR18. Sin hacer /

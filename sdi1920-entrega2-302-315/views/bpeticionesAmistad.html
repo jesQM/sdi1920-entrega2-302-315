@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block titulo %} Peticiones de Amistad {% endblock %}
+
+{% block contenido_principal %}
+<h2>Peticiones de Amistad</h2>
+<div class="table-responsive">
+
+    {% if users.length %}
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th class="col-md-1"></th>
+            </tr>
+            </thead>
+            <tbody>
+
+                {% for user in users %}
+                    <tr>
+                        <td>{{user.name}}</td>
+                        <td>{{user.surname}}</td>
+                        <td><a class="btn btn-success" href="/friends/request/accept/{{user._id.toString()}}">Aceptar <span class="glyphicon glyphicon-ok"></span></a></td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    {% else %}
+        <p>No tienes peticiones de amistad</p>
+    {% endif %}
+</div>
+
+<!-- Paginación mostrar la actual y 2 anteriores y dos siguientes -->
+<div class="row text-center">
+    <ul class="pagination">
+        {% for pagina in paginas %}
+        <li class="page-item" id="pi-{{ pagina}}">
+            <a class="page-link" href="/friends/request?pg={{ pagina}}">{{ pagina}}</a>
+        </li>
+        {% endfor %}
+        <script>
+            $("#pi-" + "{{ actual}}").addClass("active");
+        </script>
+    </ul>
+</div>
+{% endblock %}
