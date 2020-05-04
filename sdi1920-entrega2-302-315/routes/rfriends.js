@@ -5,8 +5,50 @@ module.exports = function(app, swig, gestorBD) {
     });
 
     app.get("/friends/request", function(req, res) {
-        res.send("see friend requests");
+        let criterio = {
+            email : req.session.usuario,
+        };
+        gestorBD.obtenerUsuarios( criterio, (users) => {
+            if (users && users[0]){
+                let myself = users[0];
+                let criterio2 = {
+                    userTo : myself._id,
+                };
+                gestorBD.obtenerFriendship(criterio2, (requests) => {
+                    if (requests) {
+                        // requests.map( r => t.userFrom );
+                        getAllUsersFromId( requests.map( r => r.userFrom ), (users) => {
+
+                            if (users) {
+                                let respuesta = swig.renderFile('views/bpeticionesAmistad.html', {
+                                    users : users
+                                });
+                                res.send(respuesta);
+                            } else {
+                                res.send("Error getting users");
+                            }
+                        });
+                    } else {
+                        res.send("Error getting requests");
+                    }
+                });
+
+            } else {
+                res.send("Error getting user");
+            }
+        });
     });
+
+    function getAllUsersFromId( arrayOfIDs, callback ){
+        if (arrayOfIDs.length == 0) {
+            callback([]);
+        } else {
+            let criterio = {
+                $or : arrayOfIDs.map( (identifier) => {return { _id : gestorBD.mongo.ObjectID(identifier.toString())}} )
+            }
+            gestorBD.obtenerUsuarios(criterio, callback);
+        }
+    }
 
     app.get("/friends/request/send/:id", function(req, res) {
         let criterio = {

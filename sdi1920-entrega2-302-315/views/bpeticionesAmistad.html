@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block titulo %} Peticiones de Amistad {% endblock %}
+
+{% block contenido_principal %}
+<h2>Peticiones de Amistad</h2>
+<div class="table-responsive">
+
+    {% if users.length %}
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Genero</th>
+                <th class="col-md-1"></th>
+            </tr>
+            </thead>
+            <tbody>
+
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.email }}</td>
+                        <td>Aceptar</td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    {% else %}
+        <p>No tienes peticiones de amistad</p>
+    {% endif %}
+</div>
+{% endblock %}

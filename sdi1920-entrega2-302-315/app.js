@@ -35,6 +35,13 @@ app.get("/", function(req, res) {
     res.send(respuesta);
 });
 
+let friendship = {
+    accepted : false,
+    userTo : gestorBD.mongo.ObjectID("5eb0674de752915ec09db8ac"),
+    userFrom : gestorBD.mongo.ObjectID("5eafd8278b23823600e58ad6"),
+};
+//gestorBD.insertarFriendship(friendship);
+
 app.listen(app.get('port'), function() {
     console.log('Server running at http://localhost:'+app.get('port')+'/');
 });
