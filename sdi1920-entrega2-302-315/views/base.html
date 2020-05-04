@@ -26,15 +26,23 @@
       <ul class="nav navbar-nav">
         <li id="mUsuarios" class="active"><a href="/usuarios">Lista de Usuarios</a></li>
       </ul>
-      <ul class="nav navbar-nav navbar-right">
-	    <li><a href="/registrarse"><span class="glyphicon glyphicon-user"></span> Registrate</a></li>
-        <li><a href="/identificarse"><span class="glyphicon glyphicon-log-in"></span> Identifícate</a></li>
+      <ul id="navSessionMenu" class="nav navbar-nav navbar-right">
+        <script>
+          $.ajax({url: "/whoami", success: function(result){
+            if (result) {
+              $("#navSessionMenu").html("<li><a href=\"/desconectarse\"><span class=\"glyphicon glyphicon-off\"></span> Desconectar</a></li>");
+            } else {
+              $("#navSessionMenu").html(
+                "<li><a href=\"/registrarse\"><span class=\"glyphicon glyphicon-user\"></span> Registrate</a></li>" +
+                "<li><a href=\"/identificarse\"><span class=\"glyphicon glyphicon-log-in\"></span> Identifícate</a></li>"
+              );
+            }
+          }});
+        </script>
       </ul>
     </div>
   </div>
 </nav>
-
-
 
 <div class="container">
   <script>
