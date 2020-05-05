@@ -32,6 +32,9 @@ module.exports = function(app, swig, gestorBD) {
                                         paginas.push(i);
                                     }
                                 }
+                                console.log(users)
+                                console.log(paginas)
+                                console.log(pg)
 
                                 let respuesta = swig.renderFile('views/bpeticionesAmistad.html', {
                                     users : users,

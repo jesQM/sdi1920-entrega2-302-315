@@ -45,8 +45,11 @@ module.exports = {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('users');
-                collection.count(function(err, count){
-                    collection.find(criterio).skip( (pg-1)*5 ).limit( 5 )
+                let totalResults = collection.find(criterio);
+
+                totalResults.count(function(err, count){
+                    console.log("count:" + count);
+                    totalResults.skip( (pg-1)*5 ).limit( 5 )
                         .toArray(function(err, canciones) {
                             if (err) {
                                 funcionCallback(null);
@@ -56,6 +59,7 @@ module.exports = {
                             db.close();
                         });
                 });
+
             }
         });
     },
