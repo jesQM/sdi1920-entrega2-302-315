@@ -112,5 +112,47 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get("/friends/request/accept/:friendId", function(req, res) {
         res.send("accept friend request");
+        let criterio = {
+            userTo : gestorBD.mongo.ObjectID(req.session.usuario._id.toString()),
+            userFrom : gestorBD.mongo.ObjectID(req.params.friendId),
+        };
+        // 1.- find request and mark as true
+        gestorBD.obtenerFriendship( criterio, (friendships) => {
+            if (friendships) {
+                if (friendships[0] && !friendships[0].accepted){
+                    let fr = {
+                        accepted : true,
+                    };
+                    gestorBD.modificarFriendship( { _id : friendships[0]._id},fr, (updated) => {
+                      if (updated) {
+                          // 2.- Create another in the other way as true
+                          let friendship = {
+                              accepted : true,
+                              userTo : gestorBD.mongo.ObjectID(req.session.usuario._id.toString()),
+                              userFrom : gestorBD.mongo.ObjectID(req.params.friendId),
+                          };
+                          gestorBD.insertarFriendship(friendship, function (id) {
+                              if (!id) {
+                                  res.send("There was an error adding");
+                              } else {
+                                  res.redirect("/friends/request" +
+                                      "?mensaje=¡Petición aceptada!"+
+                                      "&tipoMensaje=alert-success ");
+                              }
+                          });
+                      } else {
+                        res.send("Error updating friendship");
+                      }
+                    });
+
+                } else {
+                    res.redirect("/friends/request" +
+                        "?mensaje=Petición de amistad no encontrada"+
+                        "&tipoMensaje=alert-danger ");
+                }
+            } else {
+                res.send("Error getting friendship");
+            }
+        });
     });
 };

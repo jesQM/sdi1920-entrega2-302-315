@@ -94,4 +94,21 @@ module.exports = {
             }
         });
     },
+    modificarFriendship : function(criterio, friendship, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('friendships');
+                collection.update(criterio, {$set: friendship}, function(err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
 };
