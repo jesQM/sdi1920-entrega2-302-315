@@ -45,8 +45,8 @@ module.exports = {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('users');
-                collection.count(function(err, count){ // TODO; Repair order of operations
-                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
+                collection.count(function(err, count){
+                    collection.find(criterio).skip( (pg-1)*5 ).limit( 5 )
                         .toArray(function(err, canciones) {
                             if (err) {
                                 funcionCallback(null);
