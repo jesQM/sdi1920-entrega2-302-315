@@ -45,8 +45,10 @@ module.exports = {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('users');
-                collection.count(function(err, count){ // TODO; Repair order of operations
-                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
+                let totalResults = collection.find(criterio);
+
+                totalResults.count(function(err, count){
+                    totalResults.skip( (pg-1)*5 ).limit( 5 )
                         .toArray(function(err, canciones) {
                             if (err) {
                                 funcionCallback(null);
@@ -56,6 +58,7 @@ module.exports = {
                             db.close();
                         });
                 });
+
             }
         });
     },
@@ -88,6 +91,23 @@ module.exports = {
                         funcionCallback(null);
                     } else {
                         funcionCallback(usuarios);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+    modificarFriendship : function(criterio, friendship, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('friendships');
+                collection.update(criterio, {$set: friendship}, function(err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result);
                     }
                     db.close();
                 });

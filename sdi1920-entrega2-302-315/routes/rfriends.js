@@ -6,7 +6,7 @@ module.exports = function(app, swig, gestorBD) {
 
     app.get("/friends/request", function(req, res) {
         let criterio = {
-            email : req.session.usuario,
+            email : req.session.usuario.email,
         };
         let pg = parseInt(req.query.pg); // Es String !!!
         if ( req.query.pg == null){ // Puede no venir el param
@@ -22,8 +22,8 @@ module.exports = function(app, swig, gestorBD) {
                     if (requests) {
                         getAllUsersFromIdPag( requests.filter( r => !r.accepted).map( r => r.userFrom ), pg ,(users, total) => {
                             if (users) {
-                                let ultimaPg = total/4;
-                                if (total % 4 > 0 ){ // Sobran decimales
+                                let ultimaPg = total/5;
+                                if (total % 5 > 0 ){ // Sobran decimales
                                     ultimaPg = ultimaPg+1;
                                 }
                                 let paginas = []; // paginas mostrar
@@ -66,51 +66,102 @@ module.exports = function(app, swig, gestorBD) {
     }
 
     app.get("/friends/request/send/:id", function(req, res) {
-        let criterio = {
-            _id : gestorBD.mongo.ObjectID(req.params.id),
-        };
-
-        if (typeof req.session.usuario == "undefined" || req.session.usuario == null){
-            res.send("Usuario no en sesión");
+        let checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+        if (!checkForHexRegExp.test(req.params.id.toString())) {
+            res.redirect("/usuarios" +
+                "?mensaje=Usuario no encontrado"+
+                "&tipoMensaje=alert-danger ");
         } else {
-            gestorBD.obtenerUsuarios(criterio, function (users) {
-                if (!users || !users[0]) {
-                    res.send("User not found");
-                } else {
-                    let userTo = users[0];
-                    criterio = {
-                        email : req.session.usuario,
-                    };
-                    gestorBD.obtenerUsuarios(criterio, function (users) {
-                        if (!users || !users[0]) {
-                            res.send("User not found");
+            let criterio = {
+                _id: gestorBD.mongo.ObjectID(req.params.id),
+            };
+
+            if (typeof req.session.usuario == "undefined" || req.session.usuario == null) {
+                res.send("Usuario no en sesión");
+            } else {
+                gestorBD.obtenerUsuarios(criterio, function (users) {
+                    if (!users || !users[0]) {
+                        res.redirect("/usuarios" +
+                            "?mensaje=Usuario no encontrado"+
+                            "&tipoMensaje=alert-danger ");
+                    } else {
+                        let userTo = users[0];
+                        let userFrom = req.session.usuario;
+                        // Not sent to himself
+                        if (userFrom.email == userTo.email) {
+                            res.redirect("/usuarios" +
+                                "?mensaje=No puedes mandar una solicitud a ti mismo"+
+                                "&tipoMensaje=alert-danger ");
                         } else {
-                            let userFrom = users[0];
-                            // Not sent to himself
-                            if ( userFrom.email == userTo.email ){
-                                res.send("Cannot befriend yourself");
-                            } else {
+                            let friendship = {
+                                accepted: false,
+                                userTo: userTo._id,
+                                userFrom: userFrom._id,
+                            };
+                            gestorBD.insertarFriendship(friendship, function (id) {
+                                if (!id) {
+                                    res.send("There was an error adding");
+                                } else {
+                                    res.redirect("/usuarios");
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    app.get("/friends/request/accept/:friendId", function(req, res) {
+        let checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+        if (!checkForHexRegExp.test(req.params.friendId.toString())) {
+            res.redirect("/friends/request" +
+                "?mensaje=Petición de amistad no encontrada"+
+                "&tipoMensaje=alert-danger ");
+        } else {
+            let criterio = {
+                userTo : gestorBD.mongo.ObjectID(req.session.usuario._id.toString()),
+                userFrom : gestorBD.mongo.ObjectID(req.params.friendId.toString()),
+            };
+            // 1.- find request and mark as true
+            gestorBD.obtenerFriendship( criterio, (friendships) => {
+                if (friendships) {
+                    if (friendships[0] && !friendships[0].accepted){
+                        let fr = {
+                            accepted : true,
+                        };
+                        gestorBD.modificarFriendship( { _id : friendships[0]._id},fr, (updated) => {
+                            if (updated) {
+                                // 2.- Create another in the other way as true
                                 let friendship = {
-                                    accepted : false,
-                                    userTo : userTo._id,
-                                    userFrom : userFrom._id,
+                                    accepted : true,
+                                    userTo : gestorBD.mongo.ObjectID(req.session.usuario._id.toString()),
+                                    userFrom : gestorBD.mongo.ObjectID(req.params.friendId),
                                 };
                                 gestorBD.insertarFriendship(friendship, function (id) {
                                     if (!id) {
                                         res.send("There was an error adding");
                                     } else {
-                                        res.redirect("/usuarios");
+                                        res.redirect("/friends/request" +
+                                            "?mensaje=¡Petición aceptada!"+
+                                            "&tipoMensaje=alert-success ");
                                     }
                                 });
+                            } else {
+                                res.send("Error updating friendship");
                             }
-                        }
-                    });
+                        });
+
+                    } else {
+                        res.redirect("/friends/request" +
+                            "?mensaje=Petición de amistad no encontrada"+
+                            "&tipoMensaje=alert-danger ");
+                    }
+                } else {
+                    res.send("Error getting friendship");
                 }
             });
         }
-    });
 
-    app.get("/friends/request/accept/:friendId", function(req, res) {
-        res.send("accept friend request");
     });
 };
