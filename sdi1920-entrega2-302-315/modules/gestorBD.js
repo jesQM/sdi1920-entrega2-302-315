@@ -48,7 +48,6 @@ module.exports = {
                 let totalResults = collection.find(criterio);
 
                 totalResults.count(function(err, count){
-                    console.log("count:" + count);
                     totalResults.skip( (pg-1)*5 ).limit( 5 )
                         .toArray(function(err, canciones) {
                             if (err) {

@@ -1,9 +1,11 @@
 package com.uniovi.tests.util;
 
 
-import java.util.List;
+import static org.junit.Assert.assertTrue;
 
-import static org.junit.Assert.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -107,5 +109,21 @@ public class SeleniumUtils {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	static public void clickLinkByHref(WebDriver driver, String href) {
+	    List<WebElement> anchors = driver.findElements(By.tagName("a"));
+	    Iterator<WebElement> i = anchors.iterator();
+	    //List<String> s = anchors.stream().map( (e) -> {return e.getAttribute("href");} ).collect(Collectors.toList());
+
+	    while(i.hasNext()) {
+	        WebElement anchor = i.next();
+	        if (anchor.getAttribute("href") != null) {
+	        	if(anchor.getAttribute("href").contains(href)) {
+		            anchor.click();
+		            break;
+		        }
+	        }
+	    }
 	}
 }

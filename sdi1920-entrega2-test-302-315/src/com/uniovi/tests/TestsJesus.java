@@ -19,6 +19,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
+import com.uniovi.tests.pageobjects.PO_NavView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
 import com.uniovi.tests.util.SeleniumUtils;
@@ -157,16 +158,30 @@ public class TestsJesus {
 		
 		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"mAmigos\"]/a", 2);
 		e.get(0).click();
-		PO_HomeView.clickOption(driver, "friends/request", "class", "table-responsive");
+		PO_NavView.clickOption(driver, "friends/request", "class", "table-responsive");
 		e = driver.findElements(By.xpath("tr"));
 		assertTrue(e.size() != 0);
 	}	
 	
-	//PR18. Sin hacer /
+	// [Prueba18] Sobre el listado de invitaciones recibidas. Hacer click en el botón/enlace de una de ellas y comprobar que dicha solicitud desaparece del listado de invitaciones.
 	@Test
 	public void PR18() {
-		assertTrue("PR18 sin hacer", false);			
-	}	
+		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
+		PO_LoginView.fillForm(driver, "a@a", "a");
+		
+		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"mAmigos\"]/a", 2);
+		e.get(0).click();
+		PO_NavView.clickOption(driver, "friends/request", "class", "table-responsive");
+		e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//tr", 2);
+		
+		// Aceptar invitación 
+//		WebElement elem = e.get(0).findElement(By.tagName("a"));
+//		elem.click();
+		SeleniumUtils.clickLinkByHref(driver, "/request/accept/");
+		
+		// Esperar al mensaje
+		PO_View.checkElement(driver, "text", "¡Petición aceptada!");
+	}
 	
 	//PR19. Sin hacer /
 	@Test
