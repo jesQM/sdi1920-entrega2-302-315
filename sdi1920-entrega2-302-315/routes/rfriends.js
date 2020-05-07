@@ -135,8 +135,8 @@ module.exports = function(app, swig, gestorBD) {
                                 // 2.- Create another in the other way as true
                                 let friendship = {
                                     accepted : true,
-                                    userTo : gestorBD.mongo.ObjectID(req.session.usuario._id.toString()),
-                                    userFrom : gestorBD.mongo.ObjectID(req.params.friendId),
+                                    userFrom : gestorBD.mongo.ObjectID(req.session.usuario._id.toString()),
+                                    userTo : gestorBD.mongo.ObjectID(req.params.friendId.toString()),
                                 };
                                 gestorBD.insertarFriendship(friendship, function (id) {
                                     if (!id) {
