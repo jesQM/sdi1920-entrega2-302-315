@@ -15,6 +15,8 @@ let gestorBD = require("./modules/gestorBD.js");
 gestorBD.init(app,mongo);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+var jwt = require('jsonwebtoken');
+app.set('jwt',jwt);
 
 app.use(express.static('public'));
 app.set('port', 8081);
@@ -23,12 +25,42 @@ app.set('clave','abcdefg');
 app.set('crypto',crypto);
 
 // ROUTERS \\
+var routerUsuarioToken = express.Router();
+routerUsuarioToken.use(function(req, res, next) {
+    // obtener el token, vía headers (opcionalmente GET y/o POST).
+    var token = req.headers['token'] || req.body.token || req.query.token;
+    if (token != null) {
+        // verificar el token
+        jwt.verify(token, 'secreto', function(err, infoToken) {
+            if (err || (Date.now()/1000 - infoToken.tiempo) > 240 ){
+                res.status(403); // Forbidden
+                res.json({
+                    acceso : false,
+                    error: 'Token invalido o caducado'
+                });
+                return;
 
+            } else {
+                res.usuario = infoToken.usuario;
+                next();
+            }
+        });
+
+    } else {
+        res.status(403); // Forbidden
+        res.json({
+            acceso : false,
+            mensaje: 'No hay Token'
+        });
+    }
+});
+app.use('/api/mensaje', routerUsuarioToken);
 
 // ROUTES \\
 
 require("./routes/rusuarios.js")(app, swig, gestorBD);
 require("./routes/rfriends")(app, swig, gestorBD);
+require("./routes/rapimensajes")(app, gestorBD);
 
 app.get("/", function(req, res) {
     let respuesta = swig.renderFile('views/bhome.html', {user : req.session.usuario});
