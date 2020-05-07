@@ -1,5 +1,6 @@
 {
   "name": "sdi1920-entrega2-302-315",
+  "Description": "Red social",
   "version": "1.0.0",
   "dependencies": {
     "body-parser": "^1.19.0",
