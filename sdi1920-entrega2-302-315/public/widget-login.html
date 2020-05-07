@@ -30,27 +30,31 @@
     $(document).ready(function () {
         $("#boton-login").click(function () {
             clearNotifications();
-            $.ajax(
-                {
-                    url : URLbase + "/autenticar",
-                    type : "POST",
-                    data : {
-                        email : $("#email").val(),
-                        password : $("#password").val()
-                    },
-                    dataType : "json",
-                    success : function (res) {
-                        console.log(res.token);
-                        token = res.token;
-                        Cookies.set('token', res.token);
-                        changeView("widget-mainView.html");
-                    },
-                    error : function (error) {
-                        Cookies.remove('token');
-                        showNotification("Usuario no encontrado", "alert alert-danger");
+            if ($("#email").val() == "" || $("#password").val() == "") {
+                showNotification("Por favor, rellena los campos", "alert alert-danger");
+            } else {
+                $.ajax(
+                    {
+                        url : URLbase + "/autenticar",
+                        type : "POST",
+                        data : {
+                            email : $("#email").val(),
+                            password : $("#password").val()
+                        },
+                        dataType : "json",
+                        success : function (res) {
+                            console.log(res.token);
+                            token = res.token;
+                            Cookies.set('token', res.token);
+                            changeView("widget-mainView.html");
+                        },
+                        error : function (error) {
+                            Cookies.remove('token');
+                            showNotification("Usuario no encontrado", "alert alert-danger");
+                        }
                     }
-                }
-            )
+                )
+            }
         });
     });
 </script>
