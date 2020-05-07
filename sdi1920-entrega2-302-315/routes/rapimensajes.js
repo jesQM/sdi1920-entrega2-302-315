@@ -19,7 +19,7 @@ module.exports = function(app, gestorBD) {
                 })
             } else {
                 var token = app.get('jwt').sign(
-                    {usuario: criterio.email , tiempo: Date.now()/1000},
+                    {usuario: usuarios[0] , tiempo: Date.now()/1000},
                     "secreto");
                 res.status(200);
                 res.json({
@@ -29,6 +29,26 @@ module.exports = function(app, gestorBD) {
             }
 
         });
+    });
+
+    app.get("/api/amigos", function(req, res) {
+        console.log(res.usuario);
+        let criterio = {
+            userFrom: gestorBD.mongo.ObjectID(res.usuario._id.toString()),
+            accepted: true,
+        };
+        gestorBD.obtenerFriendship( criterio, (fr) => {
+            if (fr) {
+                res.status(200);
+                res.json(JSON.stringify(fr));
+            } else {
+                res.status(500);
+                res.json({
+                    error : "No se han podido cargar los amigos"
+                });
+            }
+        })
+
     });
 
     app.post("/api/mensaje/crear", function(req, res) {
@@ -70,11 +90,11 @@ module.exports = function(app, gestorBD) {
     });
 
 
-    app.post("/api/mensaje/ver", function(req, res) {
+    app.get("/api/mensaje/ver/:email", function(req, res) {
         var conversacion = {
             $or : [
-                { emisor : res.usuario.email, destino : req.body.destino },
-                { emisor : req.body.destino, destino : res.usuario.email },
+                { emisor : res.usuario.email, destino : req.params.destino },
+                { emisor : req.params.destino, destino : res.usuario.email },
             ]
         };
 

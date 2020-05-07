@@ -55,6 +55,7 @@ routerUsuarioToken.use(function(req, res, next) {
     }
 });
 app.use('/api/mensaje', routerUsuarioToken);
+app.use('/api/amigos', routerUsuarioToken);
 
 // ROUTES \\
 

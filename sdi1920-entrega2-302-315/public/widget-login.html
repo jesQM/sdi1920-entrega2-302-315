@@ -43,7 +43,6 @@
                         },
                         dataType : "json",
                         success : function (res) {
-                            console.log(res.token);
                             token = res.token;
                             Cookies.set('token', res.token);
                             changeView("widget-mainView.html");
