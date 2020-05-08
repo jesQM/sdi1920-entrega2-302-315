@@ -42,7 +42,7 @@
 
         for (i = 0; i < amigos.length; i++) {
             $("#tableFriends").append(
-                "<tr id=" + amigos[i]._id + " onClick=updateChat('"+amigos[i]._id.toString()+"') >" +
+                "<tr id=" + amigos[i]._id + " onClick=updateChat('"+amigos[i].email+"') >" +
                 "<td>" + amigos[i].name + " " + amigos[i].surname + "</td>" +
                 "<td>UnreadMessages</td>" +
                 "</tr>"
