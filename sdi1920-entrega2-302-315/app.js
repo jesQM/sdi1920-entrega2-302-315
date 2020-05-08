@@ -20,7 +20,7 @@ app.set('jwt',jwt);
 
 app.use(express.static('public'));
 app.set('port', 8081);
-app.set('db','mongodb://admin:sdi_Iz9@tiendamusica-shard-00-00-xmbgc.mongodb.net:27017,tiendamusica-shard-00-01-xmbgc.mongodb.net:27017,tiendamusica-shard-00-02-xmbgc.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
+app.set('db','mongodb://admin:arHPmEhl6Y764gyd@socialnetwork-shard-00-00-ezgy1.mongodb.net:27017,socialnetwork-shard-00-01-ezgy1.mongodb.net:27017,socialnetwork-shard-00-02-ezgy1.mongodb.net:27017/test?ssl=true&replicaSet=SocialNetwork-shard-0&authSource=admin&retryWrites=true&w=majority');
 app.set('clave','abcdefg');
 app.set('crypto',crypto);
 
