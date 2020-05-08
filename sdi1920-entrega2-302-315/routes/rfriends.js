@@ -95,7 +95,7 @@ module.exports = function(app, swig, gestorBD) {
                         } else {
                             let friendship = {
                                 userTo: userTo._id,
-                                userFrom: userFrom._id,
+                                userFrom: gestorBD.mongo.ObjectID(userFrom._id.toString()),
                             };
                             gestorBD.obtenerFriendship(friendship, (fr) => {
                                 if (fr) {
@@ -111,6 +111,7 @@ module.exports = function(app, swig, gestorBD) {
                                                 "&tipoMensaje=alert-warning");
                                         }
                                     } else {
+                                        friendship.accepted = false;
                                         gestorBD.insertarFriendship(friendship, function (id) {
                                             if (!id) {
                                                 res.send("There was an error adding");

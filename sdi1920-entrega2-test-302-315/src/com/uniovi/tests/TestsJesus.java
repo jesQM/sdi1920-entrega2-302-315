@@ -69,8 +69,7 @@ public class TestsJesus {
 	@Test
 	public void PR05() {
 		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
-		
-		PO_LoginView.fillForm(driver, "admin@email.com", "a");
+		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
 		
 		// The logout button is showned
 		PO_View.checkElement(driver, "text", " Desconectar");
@@ -94,7 +93,7 @@ public class TestsJesus {
 	public void PR07() {
 		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
 		
-		PO_LoginView.fillForm(driver, "admin@email.com", "incorrecta");
+		PO_LoginView.fillForm(driver, "pedro@email.com", "incorrecta");
 		
 		// The login button is still there
 		PO_View.checkElement(driver, "text", " Identifícate");
@@ -124,7 +123,7 @@ public class TestsJesus {
 	public void PR09() {
 		// First, login
 		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
-		PO_LoginView.fillForm(driver, "admin@email.com", "a");
+		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
 		
 		// Then logout
 		PO_HomeView.clickOption(driver, "desconectarse", "class", "form-horizontal");
@@ -137,23 +136,43 @@ public class TestsJesus {
 		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, " Desconectar", 2);
 	}
 	
-	//PR15. Sin hacer /
+	// [Prueba15] Desde el listado de usuarios de la aplicación, enviar una invitación de amistad a un usuario. Comprobar que la solicitud de amistad aparece en el listado de invitaciones (punto siguiente).
 	@Test
 	public void PR15() {
-		assertTrue("PR15 sin hacer", false);			
+		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
+		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		// Seleccionar a la segunda persona
+		PO_View.checkElement(driver, "id", "tableUsers");
+		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//tr[2]//a", 2);
+		e.get(0).click();
+		
+		// Esperar mensaje
+		PO_View.checkElement(driver, "class", "alert-success");
 	}	
 	
-	//PR16. Sin hacer /
+	// [Prueba16] Desde el listado de usuarios de la aplicación, enviar una invitación de amistad a un usuario al
+	// que ya le habíamos enviado la invitación previamente. No debería dejarnos enviar la invitación, se podría
+	// ocultar el botón de enviar invitación o notificar que ya había sido enviada previamente.
 	@Test
 	public void PR16() {
-		assertTrue("PR16 sin hacer", false);			
+		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
+		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		// Seleccionar a la segunda persona
+		PO_View.checkElement(driver, "id", "tableUsers");
+		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//tr[2]//a", 2);
+		e.get(0).click();
+		
+		// Esperar mensaje de error
+		PO_View.checkElement(driver, "class", "alert-warning");
 	}	
 	
 	// [Prueba17] Mostrar el listado de invitaciones de amistad recibidas. Comprobar con un listado que contenga varias invitaciones recibidas.
 	@Test
 	public void PR17() {
 		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
-		PO_LoginView.fillForm(driver, "admin@email.com", "a");
+		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
 		
 		
 		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"mAmigos\"]/a", 2);
@@ -167,7 +186,7 @@ public class TestsJesus {
 	@Test
 	public void PR18() {
 		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
-		PO_LoginView.fillForm(driver, "a@a", "a");
+		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
 		
 		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"mAmigos\"]/a", 2);
 		e.get(0).click();

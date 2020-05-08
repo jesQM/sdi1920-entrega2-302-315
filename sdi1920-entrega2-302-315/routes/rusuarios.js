@@ -100,7 +100,7 @@ module.exports = function (app, swig, gestorBD) {
                     "&tipoMensaje=alert-danger ");
             } else {
                 req.session.usuario = usuarios[0];
-                res.redirect("/"); // /usuarios // TODO;
+                res.redirect("/usuarios");
             }
         });
     });
