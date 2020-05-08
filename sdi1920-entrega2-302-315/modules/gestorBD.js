@@ -49,11 +49,11 @@ module.exports = {
 
                 totalResults.count(function(err, count){
                     totalResults.skip( (pg-1)*5 ).limit( 5 )
-                        .toArray(function(err, canciones) {
+                        .toArray(function(err, usuarios) {
                             if (err) {
                                 funcionCallback(null);
                             } else {
-                                funcionCallback(canciones, count);
+                                funcionCallback(usuarios, count);
                             }
                             db.close();
                         });
