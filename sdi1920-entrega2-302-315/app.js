@@ -57,16 +57,43 @@ routerUsuarioToken.use(function(req, res, next) {
 app.use('/api/mensaje', routerUsuarioToken);
 app.use('/api/amigos', routerUsuarioToken);
 
-// ROUTES \\
 
-require("./routes/rusuarios.js")(app, swig, gestorBD);
-require("./routes/rfriends")(app, swig, gestorBD);
-require("./routes/rapimensajes")(app, gestorBD);
+let routerUsuarioSession = express.Router();
+routerUsuarioSession.use(function(req, res, next) {
+    if(req.session.usuario)
+        next();
+    else {
+        res.redirect('/identificarse');
+    }
+});
+app.use('/usuarios', routerUsuarioSession);
+app.use('/friends', routerUsuarioSession);
 
-app.get("/", function(req, res) {
+let routerUsuarioSessionIdentificado = express.Router();
+routerUsuarioSessionIdentificado.use(function(req, res, next) {
+    if(req.session.usuario)
+        res.redirect('/home');
+    else {
+        next();
+    }
+});
+app.use('/registrarse', routerUsuarioSessionIdentificado);
+app.use('/identificarse', routerUsuarioSessionIdentificado);
+
+
+app.get("/home", function(req, res) {
     let respuesta = swig.renderFile('views/bhome.html', {user : req.session.usuario});
     res.send(respuesta);
 });
+
+app.get('/', function(req, res) {
+    res.redirect("/home");
+});
+
+// ROUTES \\
+require("./routes/rusuarios.js")(app, swig, gestorBD);
+require("./routes/rfriends")(app, swig, gestorBD);
+require("./routes/rapimensajes")(app, gestorBD);
 
 app.listen(app.get('port'), function() {
     console.log('Server running at http://localhost:'+app.get('port')+'/');
