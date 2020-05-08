@@ -1,7 +1,53 @@
 module.exports = function(app, swig, gestorBD) {
 
     app.get("/friends/list", function(req, res) {
-        res.send("lista de amigos");
+        let criterio = {
+            email : req.session.usuario.email,
+        };
+        let pg = parseInt(req.query.pg); // Es String !!!
+        if ( req.query.pg == null){ // Puede no venir el param
+            pg = 1;
+        }
+        gestorBD.obtenerUsuarios( criterio, (users) => {
+            if (users && users[0]){
+                let myself = users[0];
+                let criterio2 = {
+                    userTo : myself._id,
+                };
+                gestorBD.obtenerFriendship(criterio2, (requests) => {
+                    if (requests) {
+                        getAllUsersFromIdPag( requests.filter( r => r.accepted).map( r => r.userFrom ), pg ,(users, total) => {
+                            if (users) {
+                                let ultimaPg = total/5;
+                                if (total % 5 > 0 ){ // Sobran decimales
+                                    ultimaPg = ultimaPg+1;
+                                }
+                                let paginas = []; // paginas mostrar
+                                for(let i = pg-2 ; i <= pg+2 ; i++){
+                                    if ( i > 0 && i <= ultimaPg){
+                                        paginas.push(i);
+                                    }
+                                }
+
+                                let respuesta = swig.renderFile('views/bamigos.html', {
+                                    users : users,
+                                    paginas : paginas,
+                                    actual : pg
+                                });
+                                res.send(respuesta);
+                            } else {
+                                res.send("Error getting users");
+                            }
+                        });
+                    } else {
+                        res.send("Error getting requests");
+                    }
+                });
+
+            } else {
+                res.send("Error getting user");
+            }
+        });
     });
 
     app.get("/friends/request", function(req, res) {
