@@ -149,4 +149,27 @@ module.exports = {
             }
         });
     },
+
+    obtenerAmigosPag : function(pg,funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let totalResults = db.collection('friendships');
+
+                totalResults.count(function(err, count){
+                    totalResults.skip( (pg-1)*5 ).limit( 5 )
+                        .toArray(function(err, usuarios) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(usuarios, count);
+                            }
+                            db.close();
+                        });
+                });
+
+            }
+        });
+    },
 };
