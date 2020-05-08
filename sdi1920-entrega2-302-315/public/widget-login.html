@@ -44,6 +44,7 @@
                         dataType : "json",
                         success : function (res) {
                             token = res.token;
+                            email = res.email;
                             Cookies.set('token', res.token);
                             changeView("widget-mainView.html");
                         },
