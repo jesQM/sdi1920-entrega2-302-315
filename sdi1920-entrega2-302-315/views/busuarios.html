@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block titulo %} Tienda – uoMusic {% endblock %}
+{% block titulo %} Usuarios {% endblock %}
 {% block contenido_principal %}
 <!-- Búsqueda -->
 <div class="row">
@@ -8,7 +8,7 @@
             <div
                     class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-right">
                 <input type="text" class="search-query form-control"
-                       placeholder="Nombre de la canción" name="busqueda"/>
+                       placeholder="Nombre, apellidos, o email del usuario" name="busqueda"/>
                 <span class="input-group-btn">
 <button class="btn" type="submit">
 <span class="glyphicon glyphicon-search"></span>
@@ -19,7 +19,7 @@
     </div>
 </div>
 
-<h2>Canciones</h2>
+<h2>Usuarios</h2>
 <div class="row">
     <!-- http://librosweb.es/libro/bootstrap_3/capitulo_2/tipos_de_rejillas.html -->
     <!-- Inicio del Bloque canción -->
