@@ -94,15 +94,36 @@ module.exports = function(app, swig, gestorBD) {
                                 "&tipoMensaje=alert-danger ");
                         } else {
                             let friendship = {
-                                accepted: false,
                                 userTo: userTo._id,
-                                userFrom: userFrom._id,
+                                userFrom: gestorBD.mongo.ObjectID(userFrom._id.toString()),
                             };
-                            gestorBD.insertarFriendship(friendship, function (id) {
-                                if (!id) {
-                                    res.send("There was an error adding");
+                            gestorBD.obtenerFriendship(friendship, (fr) => {
+                                if (fr) {
+                                    // Has been sent already or is friend?
+                                    if (fr.length > 0) {
+                                        if (fr[0].accepted) {
+                                            res.redirect("/usuarios" +
+                                                "?mensaje=¡Ya es tu amigo!" +
+                                                "&tipoMensaje=alert-warning");
+                                        } else {
+                                            res.redirect("/usuarios" +
+                                                "?mensaje=¡Ya ha sido enviada anteriormente!" +
+                                                "&tipoMensaje=alert-warning");
+                                        }
+                                    } else {
+                                        friendship.accepted = false;
+                                        gestorBD.insertarFriendship(friendship, function (id) {
+                                            if (!id) {
+                                                res.send("There was an error adding");
+                                            } else {
+                                                res.redirect("/usuarios" +
+                                                    "?mensaje=¡Petición Enviada!" +
+                                                    "&tipoMensaje=alert-success");
+                                            }
+                                        });
+                                    }
                                 } else {
-                                    res.redirect("/usuarios");
+                                    res.send("Error interno");
                                 }
                             });
                         }
