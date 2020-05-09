@@ -1,4 +1,79 @@
+<style>
+    .my-custom-scrollbar {
+        position: relative;
+        height: 100%;
+        overflow: auto;
+    }
+    .table-wrapper-scroll-y {
+        display: block;
+    }
+</style>
 
-<div id="widget-panelChat">
+<div id="widget-panelChat" class="table-wrapper-scroll-y my-custom-scrollbar">
     Selecciona a un amigo para ver la conversación
+    <table id="scrollableTable" class="table table-bordered table-striped mb-0">
+        <tbody id="conversation">
+        <tr>
+            <td>Tiger Nixon</td>
+            <td>System Architect</td>
+        </tr>
+        <tr>
+            <td>Tiger Nixon</td>
+            <td>System Architect</td>
+        </tr>
+        <tr>
+            <td>Tiger Nixon</td>
+            <td>System Architect</td>
+        </tr>
+    </table>
 </div>
+
+<script>
+    var messages = [];
+    function updateChat(friendEmail) {
+        $.ajax(
+            {
+                url : URLbase + "/mensaje/ver/" + friendEmail,
+                type : "GET",
+                data: { },
+                dataType: 'json',
+                headers: { "token": token },
+                success : function (res) {
+                    messages = JSON.parse(res);
+                    updateView();
+                },
+                error : function (error) {
+                    showNotification(error, "alert alert-danger");
+                }
+            }
+        )
+    }
+    
+    function updateView() {
+        console.log(messages);
+
+        let myNode = document.getElementById("conversation");
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.lastChild);
+        }
+
+        for (i = 0; i < messages.length; i++) {
+            if (messages[i].emisor == email) {
+                $("#conversation").append(
+                    "<tr>" +
+                    "<td></td>" +
+                    "<td>"+messages[i].texto+"</td>" +
+                    "</tr>"
+                );
+            } else {
+                $("#conversation").append(
+                    "<tr>" +
+                    "<td>"+messages[i].texto+"</td>" +
+                    "<td></td>" +
+                    "</tr>"
+                );
+            }
+        }
+    }
+</script>
+

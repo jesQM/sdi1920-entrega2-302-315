@@ -44,6 +44,7 @@
 
 <script>
   var token;
+  var email;
   var URLbase = "http://localhost:8081/api";
   $( "#contenedor-principal" ).load( "widget-login.html");
   if ( Cookies.get('token') != null ){
@@ -72,6 +73,7 @@
 
   function changeView(newHTML) {
     $("#contenedor-principal").load(newHTML);
+    console.log(token);
   }
 </script>
 

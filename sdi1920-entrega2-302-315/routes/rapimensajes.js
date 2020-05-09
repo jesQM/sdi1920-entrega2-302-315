@@ -24,7 +24,8 @@ module.exports = function(app, gestorBD) {
                 res.status(200);
                 res.json({
                     autenticado: true,
-                    token : token
+                    token : token,
+                    email : usuarios[0].email
                 });
             }
 
@@ -32,15 +33,26 @@ module.exports = function(app, gestorBD) {
     });
 
     app.get("/api/amigos", function(req, res) {
-        console.log(res.usuario);
         let criterio = {
             userFrom: gestorBD.mongo.ObjectID(res.usuario._id.toString()),
             accepted: true,
         };
         gestorBD.obtenerFriendship( criterio, (fr) => {
             if (fr) {
-                res.status(200);
-                res.json(JSON.stringify(fr));
+                criterio = {
+                    $or : fr.map( (friendship) => {return { _id : gestorBD.mongo.ObjectID(friendship.userTo.toString())}} )
+                }
+                gestorBD.obtenerUsuarios(criterio, (amigos) => {
+                    if (amigos) {
+                        res.status(200);
+                        res.json(JSON.stringify(amigos));
+                    } else {
+                        res.status(500);
+                        res.json({
+                            error : "No se han podido cargar los amigos"
+                        });
+                    }
+                });
             } else {
                 res.status(500);
                 res.json({
@@ -59,47 +71,71 @@ module.exports = function(app, gestorBD) {
             leido : false,
         };
 
-        // 1.- Check they are friends
-        let criterio = {
-            userFrom: mensaje.emisor, userTo: mensaje.destino, accepted: true,
+        let criterio = { $or : [
+                {email: mensaje.emisor},
+                {email: mensaje.destino}
+            ]
         };
-        gestorBD.obtenerFriendship( criterio, (fr) => {
-            if (fr && fr.length > 0) {
-                gestorBD.insertarMensaje(mensaje, (id) => {
-                    if (id) {
-                        res.status(201);
-                        res.json({
-                            mensaje: "mensaje enviado",
-                            _id: id
-                        });
-                    } else {
-                        res.status(500);
-                        res.json({
-                            error : "No se pudo crear el mensaje"
-                        });
-                    }
-                });
+        // 1.- Get the ids
+        gestorBD.obtenerUsuarios(criterio, (users) => {
+
+            if (users) {
+                if (users.length != 2) {
+                    res.status(400);
+                    res.json({
+                        error : "No se pudo encontrar al usuario"
+                    });
+                } else {
+                    criterio = {
+                        userFrom: users[0]._id, userTo: users[1]._id, accepted: true,
+                    };
+                    // 2.- Check they are friends
+                    gestorBD.obtenerFriendship( criterio, (fr) => {
+                        if (fr && fr.length > 0) {
+                            gestorBD.insertarMensaje(mensaje, (id) => {
+                                if (id) {
+                                    res.status(201);
+                                    res.json({
+                                        mensaje: "mensaje enviado",
+                                        _id: id
+                                    });
+                                } else {
+                                    res.status(500);
+                                    res.json({
+                                        error : "No se pudo crear el mensaje"
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(400);
+                            res.json({
+                                error : "Solo puedes mandar mensajes a tus amigos"
+                            });
+                        }
+                    });
+                }
             } else {
-                res.status(400);
+                res.status(500);
                 res.json({
-                    error : "Solo puedes mandar mensajes a tus amigos"
+                    error : "No se pudo encontrar al usuario"
                 });
             }
-        })
-
+        });
     });
 
 
     app.get("/api/mensaje/ver/:email", function(req, res) {
         var conversacion = {
             $or : [
-                { emisor : res.usuario.email, destino : req.params.destino },
-                { emisor : req.params.destino, destino : res.usuario.email },
+                { emisor : res.usuario.email, destino : req.params.email },
+                { emisor : req.params.email, destino : res.usuario.email },
             ]
         };
 
+        console.log(conversacion);
         gestorBD.obtenerMensajes(conversacion, (msgs) => {
             if (msgs) {
+                console.log(msgs);
                 res.status(200);
                 res.json(JSON.stringify(msgs));
             } else {
