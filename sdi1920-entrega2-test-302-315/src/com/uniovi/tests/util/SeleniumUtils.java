@@ -13,6 +13,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.uniovi.tests.pageobjects.PO_HomeView;
+import com.uniovi.tests.pageobjects.PO_LoginView;
+
 public class SeleniumUtils {
 
 	
@@ -125,5 +128,10 @@ public class SeleniumUtils {
 		        }
 	        }
 	    }
+	}
+	
+	static public void login(WebDriver driver, String email, String password) {
+		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
+		PO_LoginView.fillForm(driver, email, password);
 	}
 }
