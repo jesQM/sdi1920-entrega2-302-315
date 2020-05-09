@@ -1,19 +1,36 @@
 package com.uniovi.tests;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 //Paquetes Java
 import java.util.List;
-//Paquetes JUnit 
-import org.junit.*;
-import org.junit.runners.MethodSorters;
-import static org.junit.Assert.assertTrue;
-//Paquetes Selenium 
-import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.*;
+import java.util.UUID;
 
+//Paquetes JUnit 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+//Paquetes Selenium 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.seleniumhq.jetty9.server.UserIdentity.UnauthenticatedUserIdentity;
+
+//Paquetes con los Page Object
+import com.uniovi.tests.pageobjects.PO_HomeView;
+import com.uniovi.tests.pageobjects.PO_ListUsersView;
+import com.uniovi.tests.pageobjects.PO_LoginView;
+import com.uniovi.tests.pageobjects.PO_NavView;
+import com.uniovi.tests.pageobjects.PO_RegisterView;
+import com.uniovi.tests.pageobjects.PO_View;
 import com.uniovi.tests.util.DatabaseAccess;
 //Paquetes Utilidades de Testing Propias
 import com.uniovi.tests.util.SeleniumUtils;
-//Paquetes con los Page Object
-import com.uniovi.tests.pageobjects.*;
 
 
 //Ordenamos las pruebas por el nombre del mÃ©todo
@@ -55,7 +72,7 @@ public class TestsPablo {
 		//Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 	}
-
+	
 	//PR01. Registro de Usuario con datos válidos. /
 	@Test
 	public void PR01() {
@@ -90,114 +107,196 @@ public class TestsPablo {
 		PO_RegisterView.fillForm(driver, "No Valido", "No Validin", "pedro@email.com", "123456", "123456");
 		SeleniumUtils.textoPresentePagina(driver, "Ya existe un usuario con el email: pedro@email.com");	
 	}
-/*	
-	//PR05. Sin hacer /
-	@Test
-	public void PR05() {
-		assertTrue("PR05 sin hacer", false);			
-	}
-	
-	//PR06. Sin hacer /
-	@Test
-	public void PR06() {
-		assertTrue("PR06 sin hacer", false);			
-	}
-	
-	//PR07. Sin hacer /
-	@Test
-	public void PR07() {
-		assertTrue("PR07 sin hacer", false);			
-	}	
-	
-	//PR08. Sin hacer /
-	@Test
-	public void PR08() {
-		assertTrue("PR08 sin hacer", false);			
-	}	
-	
-	//PR09. Sin hacer /
-	@Test
-	public void PR09() {
-		assertTrue("PR09 sin hacer", false);			
-	}	
-	//PR10. Sin hacer /
-	@Test
-	public void PR10() {
-		assertTrue("PR10 sin hacer", false);			
-	}	
-	
-	//PR11. Sin hacer /
+
+	//PR11. Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema. /
 	@Test
 	public void PR11() {
-		assertTrue("PR11 sin hacer", false);			
+		SeleniumUtils.login(driver, "ana@email.com", "ana1");
+		PO_View.checkElement(driver, "id", "tableUsers");
+		
+		// contamos users de la tabla
+		int usersCount = 0;
+		boolean isNextPage = false;
+		int i = 2;
+		do {
+			
+			List<WebElement> users = driver.findElements(By.xpath("//*[@id=\"tableUsers\"]/tbody/tr"));
+			usersCount += users.size();
+			
+			List<WebElement> elementos = driver.findElements(By.xpath("//*[@id=\"pi-"+i+"\"]/a"));
+			if(elementos.size() == 1) {
+				i++;
+				isNextPage = true;
+				elementos.get(0).click();
+			} else {
+				isNextPage = false;
+			}
+			
+		} while (isNextPage); // nextPageOfList
+		
+		assertEquals(usersCount, DatabaseAccess.getNumberOfUsers());
 	}	
 	
-	//PR12. Sin hacer /
+	//PR12. Hacer una búsqueda con el campo vacío y comprobar que se muestra la página que
+	// 		corresponde con el listado usuarios existentes en el sistema.
 	@Test
 	public void PR12() {
-		assertTrue("PR12 sin hacer", false);			
+		SeleniumUtils.login(driver, "ana@email.com", "ana1");
+		PO_View.checkElement(driver, "id", "tableUsers");
+		
+		// buscamos nada
+		PO_ListUsersView.fillForm(driver, "");
+		
+		// contamos users de la tabla
+		int usersCount = 0;
+		boolean isNextPage = false;
+		int i = 2;
+		do {
+			
+			List<WebElement> users = driver.findElements(By.xpath("//*[@id=\"tableUsers\"]/tbody/tr"));
+			usersCount += users.size();
+			
+			List<WebElement> elementos = driver.findElements(By.xpath("//*[@id=\"pi-"+i+"\"]/a"));
+			if(elementos.size() == 1) {
+				i++;
+				isNextPage = true;
+				elementos.get(0).click();
+			} else {
+				isNextPage = false;
+			}
+			
+		} while (isNextPage); // nextPageOfList
+		
+		assertEquals(DatabaseAccess.getNumberOfUsers(), usersCount);
 	}	
 	
-	//PR13. Sin hacer /
+	//PR13. Hacer una búsqueda escribiendo en el campo un texto que no exista y comprobar que se
+	//		muestra la página que corresponde, con la lista de usuarios vacía
 	@Test
 	public void PR13() {
-		assertTrue("PR13 sin hacer", false);			
+		SeleniumUtils.login(driver, "ana@email.com", "ana1");
+		PO_View.checkElement(driver, "id", "tableUsers");
+		
+		// buscamos algo no existente
+		PO_ListUsersView.fillForm(driver, UUID.randomUUID().toString());
+		
+		// contamos users de la tabla
+		int usersCount = 0;
+		boolean isNextPage = false;
+		int i = 2;
+		do {
+			
+			List<WebElement> users = driver.findElements(By.xpath("//*[@id=\"tableUsers\"]/tbody/tr"));
+			usersCount += users.size();
+			
+			List<WebElement> elementos = driver.findElements(By.xpath("//*[@id=\"pi-"+i+"\"]/a"));
+			if(elementos.size() == 1) {
+				i++;
+				isNextPage = true;
+				elementos.get(0).click();
+			} else {
+				isNextPage = false;
+			}
+			
+		} while (isNextPage); // nextPageOfList
+		
+		assertEquals(0, usersCount);
 	}	
 	
-	//PR14. Sin hacer /
+	//PR14. Hacer una búsqueda con un texto específico y comprobar que se muestra la página que
+	// 		corresponde, con la lista de usuarios en los que el texto especificados sea parte de su nombre, apellidos o
+	// 		de su email
 	@Test
 	public void PR14() {
-		assertTrue("PR14 sin hacer", false);			
+		SeleniumUtils.login(driver, "ana@email.com", "ana1");
+		PO_View.checkElement(driver, "id", "tableUsers");
+		
+		// buscamos algo existente
+		PO_ListUsersView.fillForm(driver, "jose manuel");
+		
+		// contamos users de la tabla
+		int usersCount = 0;
+		boolean isNextPage = false;
+		int i = 2;
+		do {
+			
+			List<WebElement> users = driver.findElements(By.xpath("//*[@id=\"tableUsers\"]/tbody/tr"));
+			usersCount += users.size();
+			
+			List<WebElement> elementos = driver.findElements(By.xpath("//*[@id=\"pi-"+i+"\"]/a"));
+			if(elementos.size() == 1) {
+				i++;
+				isNextPage = true;
+				elementos.get(0).click();
+			} else {
+				isNextPage = false;
+			}
+			
+		} while (isNextPage); // nextPageOfList
+		
+		assertEquals(1, usersCount);
+		SeleniumUtils.textoPresentePagina(driver, "Jose");	
 	}	
 	
-	//PR15. Sin hacer /
-	@Test
-	public void PR15() {
-		assertTrue("PR15 sin hacer", false);			
-	}	
-	
-	//PR16. Sin hacer /
-	@Test
-	public void PR16() {
-		assertTrue("PR16 sin hacer", false);			
-	}	
-	
-	//PR017. Sin hacer /
-	@Test
-	public void PR17() {
-		assertTrue("PR17 sin hacer", false);			
-	}	
-	
-	//PR18. Sin hacer /
-	@Test
-	public void PR18() {
-		assertTrue("PR18 sin hacer", false);			
-	}	
-	
-	//PR19. Sin hacer /
+	//PR19. Mostrar el listado de amigos de un usuario. 
+	//		Comprobar que el listado contiene los amigos que deben ser.
 	@Test
 	public void PR19() {
-		assertTrue("PR19 sin hacer", false);			
+		SeleniumUtils.login(driver, "dummy1@email.com", "dummy1");
+		
+		// listar amigos
+		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"mAmigos\"]/a", 2);
+		e.get(0).click();
+		PO_NavView.clickOption(driver, "friends/list", "class", "table-responsive");
+		
+		int usersCount = 0;
+		boolean isNextPage = false;
+		int i = 2;
+		do {
+			
+			List<WebElement> users = driver.findElements(By.xpath("//*[@id=\"tableUsers\"]/tbody/tr"));
+			usersCount += users.size();
+			
+			List<WebElement> elementos = driver.findElements(By.xpath("//*[@id=\"pi-"+i+"\"]/a"));
+			if(elementos.size() == 1) {
+				i++;
+				isNextPage = true;
+				elementos.get(0).click();
+			} else {
+				isNextPage = false;
+			}
+			
+		} while (isNextPage); // nextPageOfList
+		
+		// solo tiene un amigo --> dummy2
+		assertEquals(DatabaseAccess.getNumberOfFriendsOfUser("dummy1@email.com"), usersCount);
+		DatabaseAccess.closeDatabase();
 	}	
 	
-	//P20. Sin hacer /
+	//P20.  Intentar acceder sin estar autenticado a la opción de listado de usuarios. 
+	//		Se deberá volver al formulario de login.
 	@Test
 	public void PR20() {
-		assertTrue("PR20 sin hacer", false);			
+		driver.navigate().to(URL + "/usuarios");
+		PO_LoginView.checkElement(driver, "class", "btn btn-primary");
 	}	
 	
-	//PR21. Sin hacer /
+	//PR21. Intentar acceder sin estar autenticado a la opción de listado de invitaciones de amistad recibida
+	// 		de un usuario estándar. Se deberá volver al formulario de login
 	@Test
 	public void PR21() {
-		assertTrue("PR21 sin hacer", false);			
+		driver.navigate().to(URL + "/friends/request");		
+		PO_LoginView.checkElement(driver, "class", "btn btn-primary");
 	}	
 	
-	//PR22. Sin hacer /
-	@Test
-	public void PR22() {
-		assertTrue("PR22 sin hacer", false);			
-	}	
+//	//PR22. Intentar acceder estando autenticado como usuario standard a la lista de amigos de otro
+//	// 		usuario. Se deberá mostrar un mensaje de acción indebida.
+//	@Test
+//	public void PR22() {
+//		SeleniumUtils.login(driver, "ana@email.com", "ana1");		
+//	}	
 	
+/*
 	//PR23. Sin hacer /
 	@Test
 	public void PR23() {
