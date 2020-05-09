@@ -18,7 +18,7 @@ public class DatabaseAccess {
 				"mongodb://admin:arHPmEhl6Y764gyd@socialnetwork-shard-00-00-ezgy1.mongodb.net:27017,socialnetwork-shard-00-01-ezgy1.mongodb.net:27017,socialnetwork-shard-00-02-ezgy1.mongodb.net:27017/test?ssl=true&replicaSet=SocialNetwork-shard-0&authSource=admin&retryWrites=true&w=majority");
 
 		mongoClient = new MongoClient(uri);
-		MongoDatabase database = mongoClient.getDatabase("SocialNetwork");
+		MongoDatabase database = mongoClient.getDatabase("test");
 		return database;
 	}
 	
@@ -30,7 +30,7 @@ public class DatabaseAccess {
 		MongoDatabase db = getDatabase();
 		MongoCollection<Document> collection = db.getCollection( "users" );
 		Bson bsonFilter = Filters.eq("email", email);
-		collection.deleteOne(bsonFilter);
+		collection.deleteMany(bsonFilter);
 	}
 
 }

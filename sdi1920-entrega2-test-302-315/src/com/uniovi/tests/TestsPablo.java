@@ -70,21 +70,27 @@ public class TestsPablo {
 	//PR02. Registro de Usuario con datos inválidos (email vacío, nombre vacío, apellidos vacíos). /
 	@Test
 	public void PR02() {
-		assertTrue("PR02 sin hacer", false);			
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_RegisterView.fillForm(driver, "", "", "", "123456", "123456");
+		PO_RegisterView.checkElement(driver, "class", "btn btn-primary");
 	}
 
 	//PR03. Registro de Usuario con datos inválidos (repetición de contraseña inválida). /
 	@Test
 	public void PR03() {
-		assertTrue("PR03 sin hacer", false);			
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_RegisterView.fillForm(driver, "No Valido", "No Validin", "valido@email.com", "123456", "12");
+		SeleniumUtils.textoPresentePagina(driver, "Las contraseñas no coinciden");			
 	}
 	
 	//PR04. Registro de Usuario con datos inválidos (email existente). /
 	@Test
 	public void PR04() {
-		assertTrue("PR04 sin hacer", false);			
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_RegisterView.fillForm(driver, "No Valido", "No Validin", "pedro@email.com", "123456", "123456");
+		SeleniumUtils.textoPresentePagina(driver, "Ya existe un usuario con el email: pedro@email.com");	
 	}
-	
+/*	
 	//PR05. Sin hacer /
 	@Test
 	public void PR05() {
@@ -238,7 +244,7 @@ public class TestsPablo {
 	public void PR31() {
 		assertTrue("PR31 sin hacer", false);			
 	}
-	
+	*/
 		
 }
 
