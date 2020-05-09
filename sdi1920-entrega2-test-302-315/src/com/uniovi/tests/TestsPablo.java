@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 //Paquetes Selenium 
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.*;
+
+import com.uniovi.tests.util.DatabaseAccess;
 //Paquetes Utilidades de Testing Propias
 import com.uniovi.tests.util.SeleniumUtils;
 //Paquetes con los Page Object
@@ -19,10 +21,10 @@ import com.uniovi.tests.pageobjects.*;
 public class TestsPablo {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "C:\\Users\\kendo\\Downloads\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "D:\\Users\\kendo\\Downloads\\PL-SDI-Sesion5\\geckodriver024win64.exe";
 	
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024); 
-	static String URL = "https://localhost:8081";
+	static String URL = "http://localhost:8081";
 
 
 	public static WebDriver getDriver(String PathFirefox, String Geckdriver) {
@@ -54,25 +56,30 @@ public class TestsPablo {
 		driver.quit();
 	}
 
-	//PR01. Sin hacer /
+	//PR01. Registro de Usuario con datos válidos. /
 	@Test
 	public void PR01() {
-		assertTrue("PR01 sin hacer", false);			
+		PO_HomeView.clickOption(driver, "registrarse", "class", "btn btn-primary");
+		PO_RegisterView.fillForm(driver, "Valido", "Validin", "valido@email.com", "123456", "123456");
+		PO_LoginView.checkElement(driver, "class", "btn btn-primary");
+		
+		DatabaseAccess.removeUser("valido@email.com");
+		DatabaseAccess.closeDatabase();
 	}
 
-	//PR02. Sin hacer /
+	//PR02. Registro de Usuario con datos inválidos (email vacío, nombre vacío, apellidos vacíos). /
 	@Test
 	public void PR02() {
 		assertTrue("PR02 sin hacer", false);			
 	}
 
-	//PR03. Sin hacer /
+	//PR03. Registro de Usuario con datos inválidos (repetición de contraseña inválida). /
 	@Test
 	public void PR03() {
 		assertTrue("PR03 sin hacer", false);			
 	}
 	
-	//PR04. Sin hacer /
+	//PR04. Registro de Usuario con datos inválidos (email existente). /
 	@Test
 	public void PR04() {
 		assertTrue("PR04 sin hacer", false);			
