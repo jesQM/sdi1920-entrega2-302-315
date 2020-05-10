@@ -10,30 +10,58 @@
 </style>
 
 <div id="widget-panelChat" class="table-wrapper-scroll-y my-custom-scrollbar">
-    Selecciona a un amigo para ver la conversación
+    <h4 id="mensajes-sin-leer">Chat</h4>
     <table id="scrollableTable" class="table table-bordered table-striped mb-0">
         <tbody id="conversation">
-        <tr>
-            <td>Tiger Nixon</td>
-            <td>System Architect</td>
-        </tr>
-        <tr>
-            <td>Tiger Nixon</td>
-            <td>System Architect</td>
-        </tr>
-        <tr>
-            <td>Tiger Nixon</td>
-            <td>System Architect</td>
-        </tr>
+
     </table>
+    <div class="form-group">
+        <label for="textArea-mensaje">Nuevo mensaje:</label>
+        <textarea class="form-control rounded-0" id="textArea-mensaje" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-5 col-sm-10">
+            <button class="btn btn-primary" type="button" id="btn-crear-mensaje">Enviar</button>
+        </div>
+    </div>
 </div>
 
 <script>
+    $(document).ready(function () {
+        $("#btn-crear-mensaje").click(function () {
+            clearNotifications();
+            if ($("#textArea-mensaje").val() == "") {
+                showNotification("Por favor, escribe un mensaje.");
+            } else {
+                $.ajax(
+                    {
+                        url : URLbase + "/mensaje/crear",
+                        type : "POST",
+                        data : {
+                            destino : destino,
+                            texto : $("#textArea-mensaje").val()
+                        },
+                        dataType : "json",
+                        headers: { "token": token },
+                        success : function (res) {
+                            updateChat(destino);
+                        },
+                        error : function (error) {
+                            showNotification(error, "alert alert-danger");
+                        }
+                    }
+                )
+                $("#textArea-mensaje").val("");
+            }
+        });
+    });
+
     var messages = [];
     function updateChat(friendEmail) {
+        destino = friendEmail;
         $.ajax(
             {
-                url : URLbase + "/mensaje/ver/" + friendEmail,
+                url : URLbase + "/mensaje/ver/" + destino,
                 type : "GET",
                 data: { },
                 dataType: 'json',
@@ -55,12 +83,18 @@
             myNode.removeChild(myNode.lastChild);
         }
 
+        let leido = "";
         for (i = 0; i < messages.length; i++) {
-            if (messages[i].emisor == email) {
+            if (messages[i].emisor == Cookies.get('email')) {
+                if(messages[i].leido === true) {
+                    leido = "[leido]"
+                } else {
+                    leido = ""
+                }
                 $("#conversation").append(
                     "<tr>" +
                     "<td></td>" +
-                    "<td>"+messages[i].texto+"</td>" +
+                    "<td>"+messages[i].texto + "   " + leido + "</td>" +
                     "</tr>"
                 );
             } else {

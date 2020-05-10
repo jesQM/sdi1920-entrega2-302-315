@@ -1,7 +1,6 @@
 package com.uniovi.tests;
 import static org.junit.Assert.assertEquals;
 
-//Paquetes Java
 import java.util.List;
 import java.util.UUID;
 
@@ -13,13 +12,13 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-//Paquetes Selenium 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-//Paquetes con los Page Object
+import com.uniovi.tests.pageobjects.PO_Client_ChatView;
+import com.uniovi.tests.pageobjects.PO_Client_LoginView;
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_ListUsersView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
@@ -285,63 +284,114 @@ public class TestsPablo {
 	public void PR21() {
 		driver.navigate().to(URL + "/friends/request");		
 		PO_LoginView.checkElement(driver, "class", "btn btn-primary");
-	}	
+	}
 	
-//	//PR22. Intentar acceder estando autenticado como usuario standard a la lista de amigos de otro
-//	// 		usuario. Se deberá mostrar un mensaje de acción indebida.
-//	@Test
-//	public void PR22() {
-//		SeleniumUtils.login(driver, "ana@email.com", "ana1");		
-//	}	
 	
-/*
-	//PR23. Sin hacer /
+	
+	
+	/*-----------------------------------------------------------------------------------------
+	 * 
+	 * Este test no puede realizarse en nuestro caso, dado que los amigos se muestran
+	 * en función del usuario que se encuentra en sesión, y por tanto no es algo que pueda
+	 * vulnerarse a través de una petición de otro tipo.
+
+	//PR22. Intentar acceder estando autenticado como usuario standard a la lista de amigos de otro
+	// 		usuario. Se deberá mostrar un mensaje de acción indebida.
 	@Test
-	public void PR23() {
-		assertTrue("PR23 sin hacer", false);			
+	public void PR22() {
+		SeleniumUtils.login(driver, "ana@email.com", "ana1");		
 	}	
 	
-	//PR24. Sin hacer /
-	@Test
-	public void PR24() {
-		assertTrue("PR24 sin hacer", false);			
-	}	
-	//PR25. Sin hacer /
-	@Test
-	public void PR25() {
-		assertTrue("PR25 sin hacer", false);			
-	}	
+	*-----------------------------------------------------------------------------------------
+	*/
 	
-	//PR26. Sin hacer /
-	@Test
-	public void PR26() {
-		assertTrue("PR26 sin hacer", false);			
-	}	
 	
-	//PR27. Sin hacer /
+	//PR28. Acceder a la lista de mensajes de un amigo “chat” y crear un nuevo mensaje,
+	//   	validar que el mensaje aparece en la lista de mensajes.
 	@Test
-	public void PR27() {
-		assertTrue("PR27 sin hacer", false);			
-	}	
+	public void PR28() {
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy1@email.com", "dummy1");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		users.get(0).click();
+		
+		String text = "Esto es un mensaje.";
+		PO_Client_ChatView.fillForm(driver, text);
+		
+		SeleniumUtils.esperarSegundos(driver, 2);
+		SeleniumUtils.textoPresentePagina(driver, text);
+	}
 	
-	//PR029. Sin hacer /
+	//PR29. Identificarse en la aplicación y enviar un mensaje a un amigo, validar que el mensaje enviado
+	//		aparece en el chat. Identificarse después con el usuario que recibido el mensaje y validar que tiene un
+	//		mensaje sin leer, entrar en el chat y comprobar que el mensaje pasa a tener el estado leído.
 	@Test
 	public void PR29() {
-		assertTrue("PR29 sin hacer", false);			
-	}
-
-	//PR030. Sin hacer /
-	@Test
-	public void PR30() {
-		assertTrue("PR30 sin hacer", false);			
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy1@email.com", "dummy1");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		users.get(0).click();
+		
+		String text1 = "Mensaje para Test29";
+		
+		PO_Client_ChatView.fillForm(driver, text1);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		SeleniumUtils.textoPresentePagina(driver, text1);
+		
+		SeleniumUtils.clickLinkByHref(driver, "home");
+		
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy2@email.com", "dummy2");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		List<WebElement> users2 = SeleniumUtils.EsperaCargaPaginaxpath(driver, "/html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 1);
+		users2.get(0).click();
+		assertEquals(DatabaseAccess.getNumberOfNonReadedMessages("dummy1@email.com"), 0);
 	}
 	
-	//PR031. Sin hacer /
+	//PR30. Identificarse en la aplicación y enviar tres mensajes a un amigo, validar que los mensajes
+	// 		enviados aparecen en el chat. Identificarse después con el usuario que recibido el mensaje y validar que el
+	// 		número de mensajes sin leer aparece en la propia lista de amigos.
 	@Test
-	public void PR31() {
-		assertTrue("PR31 sin hacer", false);			
+	public void PR30() {
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy1@email.com", "dummy1");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		users.get(0).click();
+		
+		String text1 = "Mensaje 1.";
+		String text2 = "Mensaje 2.";
+		String text3 = "Mensaje 3.";
+		
+		PO_Client_ChatView.fillForm(driver, text1);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		
+		PO_Client_ChatView.fillForm(driver, text2);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		
+		PO_Client_ChatView.fillForm(driver, text3);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		
+		SeleniumUtils.textoPresentePagina(driver, text1);
+		SeleniumUtils.textoPresentePagina(driver, text2);
+		SeleniumUtils.textoPresentePagina(driver, text3);
+		
+		SeleniumUtils.clickLinkByHref(driver, "home");
+		
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy2@email.com", "dummy2");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		SeleniumUtils.textoPresentePagina(driver, String.valueOf(DatabaseAccess.getNumberOfNonReadedMessages("dummy2@email.com")));
+		
 	}
-	*/
 		
 }
 

@@ -116,5 +116,15 @@ public class DatabaseAccess {
 			doc.append("texto", text);
 			doc.append("leido", leido);
 		collection.insertOne(doc);
+  }
+	
+	public static int getNumberOfNonReadedMessages(String destino) {
+		MongoDatabase db = getDatabase();
+		MongoCollection<Document> collection = db.getCollection("mensajes");
+		Bson bsonFilter = Filters.and(
+								Filters.eq("destino", destino),
+								Filters.eq("leido", false)
+						  );
+		return (int) collection.count(bsonFilter);
 	}
 }
