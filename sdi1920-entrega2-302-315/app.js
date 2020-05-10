@@ -32,7 +32,7 @@ routerUsuarioToken.use(function(req, res, next) {
     if (token != null) {
         // verificar el token
         jwt.verify(token, 'secreto', function(err, infoToken) {
-            if (err || (Date.now()/1000 - infoToken.tiempo) > 600 ){
+            if (err || (Date.now()/1000 - infoToken.tiempo) > 1800 ){
                 res.status(403); // Forbidden
                 res.json({
                     acceso : false,

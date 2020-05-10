@@ -286,12 +286,25 @@ public class TestsPablo {
 		PO_LoginView.checkElement(driver, "class", "btn btn-primary");
 	}
 	
-//	//PR22. Intentar acceder estando autenticado como usuario standard a la lista de amigos de otro
-//	// 		usuario. Se deberá mostrar un mensaje de acción indebida.
-//	@Test
-//	public void PR22() {
-//		SeleniumUtils.login(driver, "ana@email.com", "ana1");		
-//	}	
+	
+	
+	
+	/*-----------------------------------------------------------------------------------------
+	 * 
+	 * Este test no puede realizarse en nuestro caso, dado que los amigos se muestran
+	 * en función del usuario que se encuentra en sesión, y por tanto no es algo que pueda
+	 * vulnerarse a través de una petición de otro tipo.
+
+	//PR22. Intentar acceder estando autenticado como usuario standard a la lista de amigos de otro
+	// 		usuario. Se deberá mostrar un mensaje de acción indebida.
+	@Test
+	public void PR22() {
+		SeleniumUtils.login(driver, "ana@email.com", "ana1");		
+	}	
+	
+	*-----------------------------------------------------------------------------------------
+	*/
+	
 	
 	//PR28. Acceder a la lista de mensajes de un amigo “chat” y crear un nuevo mensaje,
 	//   	validar que el mensaje aparece en la lista de mensajes.
@@ -309,6 +322,35 @@ public class TestsPablo {
 		
 		SeleniumUtils.esperarSegundos(driver, 2);
 		SeleniumUtils.textoPresentePagina(driver, text);
+	}
+	
+	//PR29. Identificarse en la aplicación y enviar un mensaje a un amigo, validar que el mensaje enviado
+	//		aparece en el chat. Identificarse después con el usuario que recibido el mensaje y validar que tiene un
+	//		mensaje sin leer, entrar en el chat y comprobar que el mensaje pasa a tener el estado leído.
+	@Test
+	public void PR29() {
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy1@email.com", "dummy1");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		users.get(0).click();
+		
+		String text1 = "Mensaje para Test29";
+		
+		PO_Client_ChatView.fillForm(driver, text1);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		SeleniumUtils.textoPresentePagina(driver, text1);
+		
+		SeleniumUtils.clickLinkByHref(driver, "home");
+		
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy2@email.com", "dummy2");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		List<WebElement> users2 = SeleniumUtils.EsperaCargaPaginaxpath(driver, "/html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 1);
+		users2.get(0).click();
+		assertEquals(DatabaseAccess.getNumberOfNonReadedMessages("dummy1@email.com"), 0);
 	}
 	
 	//PR30. Identificarse en la aplicación y enviar tres mensajes a un amigo, validar que los mensajes
@@ -336,6 +378,10 @@ public class TestsPablo {
 		PO_Client_ChatView.fillForm(driver, text3);
 		SeleniumUtils.esperarSegundos(driver, 2);
 		
+		SeleniumUtils.textoPresentePagina(driver, text1);
+		SeleniumUtils.textoPresentePagina(driver, text2);
+		SeleniumUtils.textoPresentePagina(driver, text3);
+		
 		SeleniumUtils.clickLinkByHref(driver, "home");
 		
 		SeleniumUtils.clickLinkByHref(driver, "cliente");
@@ -346,51 +392,6 @@ public class TestsPablo {
 		SeleniumUtils.textoPresentePagina(driver, String.valueOf(DatabaseAccess.getNumberOfNonReadedMessages("dummy2@email.com")));
 		
 	}
-	
-/*
-	//PR23. Sin hacer /
-	@Test
-	public void PR23() {
-		assertTrue("PR23 sin hacer", false);			
-	}	
-	
-	//PR24. Sin hacer /
-	@Test
-	public void PR24() {
-		assertTrue("PR24 sin hacer", false);			
-	}	
-	//PR25. Sin hacer /
-	@Test
-	public void PR25() {
-		assertTrue("PR25 sin hacer", false);			
-	}	
-	
-	//PR26. Sin hacer /
-	@Test
-	public void PR26() {
-		assertTrue("PR26 sin hacer", false);			
-	}	
-	
-	//PR27. Sin hacer /
-	@Test
-	public void PR27() {
-		assertTrue("PR27 sin hacer", false);			
-	}	
-	
-	//PR029. Sin hacer /
-	@Test
-	public void PR29() {
-		assertTrue("PR29 sin hacer", false);			
-	}
-
-	
-	
-	//PR031. Sin hacer /
-	@Test
-	public void PR31() {
-		assertTrue("PR31 sin hacer", false);			
-	}
-	*/
 		
 }
 
