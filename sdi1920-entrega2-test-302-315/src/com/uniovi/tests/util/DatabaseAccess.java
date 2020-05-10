@@ -105,4 +105,16 @@ public class DatabaseAccess {
 				);
 		collection.deleteMany(bsonFilter);
 	}
+
+	public static void writeMessage(String emisor, String destino, String text, boolean leido) {
+		MongoDatabase db = getDatabase();
+		MongoCollection<Document> collection = db.getCollection("mensajes");
+		
+		Document doc = new Document();
+			doc.append("emisor", destino);
+			doc.append("destino", emisor);
+			doc.append("texto", text);
+			doc.append("leido", leido);
+		collection.insertOne(doc);
+	}
 }
