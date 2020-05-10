@@ -58,7 +58,7 @@
         }
 
         for (i = 0; i < messages.length; i++) {
-            if (messages[i].emisor == email) {
+            if (messages[i].emisor == Cookies.get('email')) {
                 $("#conversation").append(
                     "<tr>" +
                     "<td></td>" +
