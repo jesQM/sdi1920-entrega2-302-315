@@ -131,16 +131,30 @@ module.exports = function(app, gestorBD) {
             ]
         };
 
-        console.log(conversacion);
-        gestorBD.obtenerMensajes(conversacion, (msgs) => {
-            if (msgs) {
-                console.log(msgs);
-                res.status(200);
-                res.json(JSON.stringify(msgs));
+        var criterio = {
+            destino: res.usuario.email,
+            emisor: req.params.email,
+            leido: false,
+        };
+        gestorBD.marcarLeidoMensajes(criterio, (update) => {
+            if (update) {
+                // console.log(conversacion);
+                gestorBD.obtenerMensajes(conversacion, (msgs) => {
+                    if (msgs) {
+                        console.log(msgs);
+                        res.status(200);
+                        res.json(JSON.stringify(msgs));
+                    } else {
+                        res.status(500);
+                        res.json({
+                            error : "No se pudo leer la conversación"
+                        });
+                    }
+                });
             } else {
                 res.status(500);
                 res.json({
-                    error : "No se pudo leer la conversación"
+                    error : "No se pudo actualizar el estado de los mensajes"
                 });
             }
         });
