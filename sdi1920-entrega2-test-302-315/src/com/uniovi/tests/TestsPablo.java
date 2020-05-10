@@ -2,6 +2,7 @@ package com.uniovi.tests;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.UUID;
 
 //Paquetes JUnit 
 import org.junit.After;
@@ -18,7 +19,11 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.uniovi.tests.pageobjects.PO_Client_ChatView;
 import com.uniovi.tests.pageobjects.PO_Client_LoginView;
+import com.uniovi.tests.pageobjects.PO_HomeView;
+import com.uniovi.tests.pageobjects.PO_ListUsersView;
+import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
+import com.uniovi.tests.pageobjects.PO_RegisterView;
 import com.uniovi.tests.pageobjects.PO_View;
 import com.uniovi.tests.util.DatabaseAccess;
 //Paquetes Utilidades de Testing Propias
@@ -64,7 +69,7 @@ public class TestsPablo {
 		//Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 	}
-	/*
+	
 	//PR01. Registro de Usuario con datos válidos. /
 	@Test
 	public void PR01() {
@@ -279,7 +284,7 @@ public class TestsPablo {
 	public void PR21() {
 		driver.navigate().to(URL + "/friends/request");		
 		PO_LoginView.checkElement(driver, "class", "btn btn-primary");
-	}	*/
+	}
 	
 //	//PR22. Intentar acceder estando autenticado como usuario standard a la lista de amigos de otro
 //	// 		usuario. Se deberá mostrar un mensaje de acción indebida.
@@ -306,6 +311,41 @@ public class TestsPablo {
 		SeleniumUtils.textoPresentePagina(driver, text);
 	}
 	
+	//PR30. Identificarse en la aplicación y enviar tres mensajes a un amigo, validar que los mensajes
+	// 		enviados aparecen en el chat. Identificarse después con el usuario que recibido el mensaje y validar que el
+	// 		número de mensajes sin leer aparece en la propia lista de amigos.
+	@Test
+	public void PR30() {
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy1@email.com", "dummy1");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		users.get(0).click();
+		
+		String text1 = "Mensaje 1.";
+		String text2 = "Mensaje 2.";
+		String text3 = "Mensaje 3.";
+		
+		PO_Client_ChatView.fillForm(driver, text1);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		
+		PO_Client_ChatView.fillForm(driver, text2);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		
+		PO_Client_ChatView.fillForm(driver, text3);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		
+		SeleniumUtils.clickLinkByHref(driver, "home");
+		
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy2@email.com", "dummy2");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		SeleniumUtils.textoPresentePagina(driver, String.valueOf(DatabaseAccess.getNumberOfNonReadedMessages("dummy2@email.com")));
+		
+	}
 	
 /*
 	//PR23. Sin hacer /
@@ -343,11 +383,7 @@ public class TestsPablo {
 		assertTrue("PR29 sin hacer", false);			
 	}
 
-	//PR030. Sin hacer /
-	@Test
-	public void PR30() {
-		assertTrue("PR30 sin hacer", false);			
-	}
+	
 	
 	//PR031. Sin hacer /
 	@Test
