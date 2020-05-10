@@ -44,12 +44,13 @@
                         dataType : "json",
                         success : function (res) {
                             token = res.token;
-                            email = res.email;
                             Cookies.set('token', res.token);
+                            Cookies.set('email', res.email);
                             changeView("widget-mainView.html");
                         },
                         error : function (error) {
                             Cookies.remove('token');
+                            Cookies.remove('email');
                             showNotification("Usuario no encontrado", "alert alert-danger");
                         }
                     }

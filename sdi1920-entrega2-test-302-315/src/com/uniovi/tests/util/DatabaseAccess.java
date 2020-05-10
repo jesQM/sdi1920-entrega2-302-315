@@ -1,5 +1,8 @@
 package com.uniovi.tests.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -26,6 +29,17 @@ public class DatabaseAccess {
 	
 	public static void closeDatabase() {
 		mongoClient.close();
+	}
+	
+	public static String getUserIdFromEmail(String email) {
+		MongoDatabase db = getDatabase();
+		MongoCollection<Document> collection = db.getCollection("users");
+		Bson bsonFilter = Filters.eq("email", email);
+		FindIterable<Document> docs = collection.find(bsonFilter);
+		for (Document doc : docs) {
+			return doc.get("_id").toString();
+		}
+		return null;
 	}
 	
 	public static void removeUser(String email) {
@@ -55,4 +69,41 @@ public class DatabaseAccess {
 		return -1;
 	}
 
+	public static void createFriendship(String from, String to, boolean accepted) {
+		MongoDatabase db = getDatabase();
+		MongoCollection<Document> collection = db.getCollection("friendships");
+		List<Document> docs = new ArrayList<>();
+		
+		Document doc = new Document();
+			doc.append("userTo", new ObjectId(to));
+			doc.append("userFrom", new ObjectId(from));
+			doc.append("accepted", accepted);
+		docs.add(doc);
+		if (accepted) {
+			Document otherWay = new Document();
+				doc.append("userFrom", new ObjectId(to));
+				doc.append("userTo", new ObjectId(from));
+				doc.append("accepted", accepted);
+			docs.add(otherWay);
+		}
+		
+		collection.insertMany(docs);
+	}
+	
+	public static void removeFriendship(String from, String to) {
+		MongoDatabase db = getDatabase();
+		MongoCollection<Document> collection = db.getCollection("friendships");
+		Bson bsonFilter = 
+				Filters.or(
+					Filters.and( // One way
+						Filters.eq("userFrom", new ObjectId(from)), 
+						Filters.eq("userTo", new ObjectId(to))
+					),
+					Filters.and( // The other way
+							Filters.eq("userFrom", new ObjectId(to)), 
+							Filters.eq("userTo", new ObjectId(from))
+					)
+				);
+		collection.deleteMany(bsonFilter);
+	}
 }
