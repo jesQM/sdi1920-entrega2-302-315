@@ -123,7 +123,6 @@ module.exports = function(app, gestorBD) {
         });
     });
 
-
     app.get("/api/mensaje/ver/:email", function(req, res) {
         var conversacion = {
             $or : [
@@ -144,6 +143,25 @@ module.exports = function(app, gestorBD) {
                     error : "No se pudo leer la conversación"
                 });
             }
+        });
+
+    });
+
+    app.post("/api/mensaje/numero", function(req, res) {
+
+        var amigo = req.body.amigo;
+
+        var criterio = {
+            emisor: amigo.email,
+            destino: res.usuario.email,
+            leido: false,
+        };
+
+        gestorBD.obtenerNumeroMensajes(criterio, (numeroMensajes) => {
+            console.log(numeroMensajes);
+                res.status(200);
+                amigo.numberOfMessages = numeroMensajes;
+                res.json(JSON.stringify(amigo));
         });
 
     });
