@@ -1,9 +1,7 @@
 package com.uniovi.tests;
 import static org.junit.Assert.assertEquals;
 
-//Paquetes Java
 import java.util.List;
-import java.util.UUID;
 
 //Paquetes JUnit 
 import org.junit.After;
@@ -13,18 +11,14 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-//Paquetes Selenium 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-//Paquetes con los Page Object
-import com.uniovi.tests.pageobjects.PO_HomeView;
-import com.uniovi.tests.pageobjects.PO_ListUsersView;
-import com.uniovi.tests.pageobjects.PO_LoginView;
+import com.uniovi.tests.pageobjects.PO_Client_ChatView;
+import com.uniovi.tests.pageobjects.PO_Client_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
-import com.uniovi.tests.pageobjects.PO_RegisterView;
 import com.uniovi.tests.pageobjects.PO_View;
 import com.uniovi.tests.util.DatabaseAccess;
 //Paquetes Utilidades de Testing Propias
@@ -70,7 +64,7 @@ public class TestsPablo {
 		//Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 	}
-	
+	/*
 	//PR01. Registro de Usuario con datos válidos. /
 	@Test
 	public void PR01() {
@@ -285,7 +279,7 @@ public class TestsPablo {
 	public void PR21() {
 		driver.navigate().to(URL + "/friends/request");		
 		PO_LoginView.checkElement(driver, "class", "btn btn-primary");
-	}	
+	}	*/
 	
 //	//PR22. Intentar acceder estando autenticado como usuario standard a la lista de amigos de otro
 //	// 		usuario. Se deberá mostrar un mensaje de acción indebida.
@@ -293,6 +287,25 @@ public class TestsPablo {
 //	public void PR22() {
 //		SeleniumUtils.login(driver, "ana@email.com", "ana1");		
 //	}	
+	
+	//PR28. Acceder a la lista de mensajes de un amigo “chat” y crear un nuevo mensaje,
+	//   	validar que el mensaje aparece en la lista de mensajes.
+	@Test
+	public void PR28() {
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy1@email.com", "dummy1");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		users.get(0).click();
+		
+		String text = "Esto es un mensaje.";
+		PO_Client_ChatView.fillForm(driver, text);
+		
+		SeleniumUtils.esperarSegundos(driver, 2);
+		SeleniumUtils.textoPresentePagina(driver, text);
+	}
+	
 	
 /*
 	//PR23. Sin hacer /

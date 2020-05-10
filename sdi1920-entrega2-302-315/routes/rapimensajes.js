@@ -158,7 +158,6 @@ module.exports = function(app, gestorBD) {
         };
 
         gestorBD.obtenerNumeroMensajes(criterio, (numeroMensajes) => {
-            console.log(numeroMensajes);
                 res.status(200);
                 amigo.numberOfMessages = numeroMensajes;
                 res.json(JSON.stringify(amigo));

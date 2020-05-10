@@ -15,6 +15,8 @@
 
 <script>
     var amigos = [];
+    var selectedFriend = null;
+    var searchInterval = null;
     $(document).ready(function () {
         $.ajax(
             {
@@ -35,7 +37,15 @@
     });
 
     var amigosCompleteInfo = [];
+
     function loadNumberOfMessages() {
+        numberOfMessages();
+        if (searchInterval) clearInterval(searchInterval);
+        searchInterval = setInterval( () => numberOfMessages(), 2000 );
+    }
+
+    function numberOfMessages() {
+        amigosCompleteInfo = [];
         for (i = 0; i < amigos.length; i++) {
             $.ajax(
                 {
@@ -60,7 +70,7 @@
 
     function loadChat(email) {
         $( "#panelChat" ).show();
-        updateChat(email);
+        changeSelectedFriend(email);
     }
 
     function listFriends(){
@@ -79,6 +89,13 @@
                 "</tr>"
             );
         }
+    }
+
+    function changeSelectedFriend(email) {
+        selectedFriend = email;
+        updateChat(selectedFriend);
+        if (searchInterval) clearInterval(searchInterval);
+        searchInterval = setInterval( () => updateChat(selectedFriend), 1000 );
     }
 
 </script>
