@@ -22,6 +22,7 @@ import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
+import com.uniovi.tests.util.DatabaseAccess;
 import com.uniovi.tests.util.SeleniumUtils;
 
 
@@ -73,7 +74,9 @@ public class TestsJesus {
 		
 		// The logout button is showned
 		PO_View.checkElement(driver, "text", " Desconectar");
-		//TODO; another test perhaps?
+		
+		// We are on users list view
+		PO_View.checkElement(driver, "id", "tableUsers");
 	}
 	
 	// [Prueba6] Inicio de sesión con datos inválidos (usuario estándar, campo email y contraseña vacíos).
@@ -139,6 +142,12 @@ public class TestsJesus {
 	// [Prueba15] Desde el listado de usuarios de la aplicación, enviar una invitación de amistad a un usuario. Comprobar que la solicitud de amistad aparece en el listado de invitaciones (punto siguiente).
 	@Test
 	public void PR15() {
+		// 1.- Eliminar posible invitación al usuario seleccionado
+		String id1 = DatabaseAccess.getUserIdFromEmail("pedro@email.com");
+		String id2 = DatabaseAccess.getUserIdFromEmail("ana@email.com");
+		DatabaseAccess.removeFriendship(id1, id2);
+		
+		// Login
 		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
 		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
 		
@@ -171,108 +180,90 @@ public class TestsJesus {
 	// [Prueba17] Mostrar el listado de invitaciones de amistad recibidas. Comprobar con un listado que contenga varias invitaciones recibidas.
 	@Test
 	public void PR17() {
+		// 1.- Insert friend requests
+		String to = DatabaseAccess.getUserIdFromEmail("pedro@email.com");
+		String from1 = DatabaseAccess.getUserIdFromEmail("ana@email.com");
+		String from2 = DatabaseAccess.getUserIdFromEmail("susana@email.com");
+		// Delete previous in case already friends
+		DatabaseAccess.removeFriendship(to, from1);
+		DatabaseAccess.removeFriendship(to, from2);
+		DatabaseAccess.createFriendship(from1, to, false);
+		DatabaseAccess.createFriendship(from2, to, false);
+		
+		// Login
 		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
 		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
 		
-		
+		// Move to the view
 		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"mAmigos\"]/a", 2);
 		e.get(0).click();
-		PO_NavView.clickOption(driver, "friends/request", "class", "table-responsive");
-		e = driver.findElements(By.xpath("tr"));
+		PO_View.checkElement(driver, "id", "mListarPeticiones");
+		SeleniumUtils.clickLinkByHref(driver, "/friends/request");
+		
+		// Count rows
+		PO_View.checkElement(driver, "class", "table-responsive");
+		e = driver.findElements(By.xpath("//tr"));
 		assertTrue(e.size() != 0);
 	}	
 	
 	// [Prueba18] Sobre el listado de invitaciones recibidas. Hacer click en el botón/enlace de una de ellas y comprobar que dicha solicitud desaparece del listado de invitaciones.
 	@Test
 	public void PR18() {
+		// 1.- Insert friend request
+		String to = DatabaseAccess.getUserIdFromEmail("pedro@email.com");
+		String from = DatabaseAccess.getUserIdFromEmail("ana@email.com");
+		// Delete previous in case already friends
+		DatabaseAccess.removeFriendship(to, from);
+		DatabaseAccess.createFriendship(from, to, false);
+		
+		// Login
 		PO_HomeView.clickOption(driver, "identificarse", "class", "form-horizontal");
 		PO_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
 		
+		// Move to the view
 		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"mAmigos\"]/a", 2);
 		e.get(0).click();
-		PO_NavView.clickOption(driver, "friends/request", "class", "table-responsive");
-		e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//tr", 2);
+		PO_View.checkElement(driver, "id", "mListarPeticiones");
+		SeleniumUtils.clickLinkByHref(driver, "/friends/request");
 		
-		// Aceptar invitación 
-//		WebElement elem = e.get(0).findElement(By.tagName("a"));
-//		elem.click();
+		// Aceptar invitación
+		PO_View.checkElement(driver, "class", "table-responsive");
 		SeleniumUtils.clickLinkByHref(driver, "/request/accept/");
 		
 		// Esperar al mensaje
 		PO_View.checkElement(driver, "text", "¡Petición aceptada!");
 	}
 	
-	//PR19. Sin hacer /
-	@Test
-	public void PR19() {
-		assertTrue("PR19 sin hacer", false);			
-	}	
 	
-	//P20. Sin hacer /
-	@Test
-	public void PR20() {
-		assertTrue("PR20 sin hacer", false);			
-	}	
-	
-	//PR21. Sin hacer /
-	@Test
-	public void PR21() {
-		assertTrue("PR21 sin hacer", false);			
-	}	
-	
-	//PR22. Sin hacer /
-	@Test
-	public void PR22() {
-		assertTrue("PR22 sin hacer", false);			
-	}	
 	
 	//PR23. Sin hacer /
 	@Test
 	public void PR23() {
 		assertTrue("PR23 sin hacer", false);			
-	}	
+	}
 	
 	//PR24. Sin hacer /
 	@Test
 	public void PR24() {
 		assertTrue("PR24 sin hacer", false);			
-	}	
+	}
+	
 	//PR25. Sin hacer /
 	@Test
 	public void PR25() {
 		assertTrue("PR25 sin hacer", false);			
-	}	
+	}
 	
 	//PR26. Sin hacer /
 	@Test
 	public void PR26() {
 		assertTrue("PR26 sin hacer", false);			
-	}	
+	}
 	
 	//PR27. Sin hacer /
 	@Test
 	public void PR27() {
 		assertTrue("PR27 sin hacer", false);			
-	}	
-	
-	//PR029. Sin hacer /
-	@Test
-	public void PR29() {
-		assertTrue("PR29 sin hacer", false);			
 	}
-
-	//PR030. Sin hacer /
-	@Test
-	public void PR30() {
-		assertTrue("PR30 sin hacer", false);			
-	}
-	
-	//PR031. Sin hacer /
-	@Test
-	public void PR31() {
-		assertTrue("PR31 sin hacer", false);			
-	}
-	
-		
 }
 
