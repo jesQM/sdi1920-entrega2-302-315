@@ -132,10 +132,8 @@ module.exports = function(app, gestorBD) {
             ]
         };
 
-        console.log(conversacion);
         gestorBD.obtenerMensajes(conversacion, (msgs) => {
             if (msgs) {
-                console.log(msgs);
                 res.status(200);
                 res.json(JSON.stringify(msgs));
             } else {

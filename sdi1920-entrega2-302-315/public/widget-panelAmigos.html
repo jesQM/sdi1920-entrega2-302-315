@@ -1,12 +1,7 @@
 
 <div id="widget-panelAmigos" style="background-color: lavender; ">
+    <input type="text" class="form-control" placeholder="Buscar amigo" id="filtro-amigo"/>
     <table class="table table-hover">
-        <thead>
-        <tr>
-            <th class="col-md-1"></th>
-            <th class="col-md-1"></th>
-        </tr>
-        </thead>
         <tbody id="tableFriends">
 
         </tbody>
@@ -27,7 +22,7 @@
                 headers: { "token": token },
                 success : function (res) {
                     amigos = JSON.parse(res);
-                    listFriends();
+                    listFriends(amigos);
                 },
                 error : function (error) {
                     showNotification(error, "alert alert-danger");
@@ -36,16 +31,31 @@
         )
     });
 
-    function listFriends(){
+    $('#filtro-amigo').on('input',function(e){
+        var filtro = [];
+        var nombreFiltro = $("#filtro-amigo").val();
+
+        for (i = 0; i < amigos.length; i++) {
+            if (amigos[i].name.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
+                || amigos[i].surname.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
+                || (amigos[i].name.toLowerCase() + " " + amigos[i].surname.toLowerCase()).indexOf(nombreFiltro.toLowerCase()) != -1)
+            {
+                filtro.push(amigos[i]);
+            }
+        }
+        listFriends(filtro);
+    });
+
+    function listFriends(friends){
         let myNode = document.getElementById("tableFriends");
         while (myNode.firstChild) {
             myNode.removeChild(myNode.lastChild);
         }
 
-        for (i = 0; i < amigos.length; i++) {
+        for (i = 0; i < friends.length; i++) {
             $("#tableFriends").append(
-                "<tr id=" + amigos[i]._id + " onClick=changeSelectedFriend('"+amigos[i].email+"') >" +
-                "<td>" + amigos[i].name + " " + amigos[i].surname + "</td>" +
+                "<tr id=" + friends[i]._id + " onClick=changeSelectedFriend('"+friends[i].email+"') >" +
+                "<td>" + friends[i].name + " " + friends[i].surname + "</td>" +
                 "<td>UnreadMessages</td>" +
                 "</tr>"
             );
