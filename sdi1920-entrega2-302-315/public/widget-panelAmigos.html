@@ -3,7 +3,7 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <th class="col-md-1"></th>
+            <th class="col-md-1">Chats recientes</th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
@@ -15,6 +15,9 @@
 
 <script>
     var amigos = [];
+    var selectedFriend = null;
+    var searchInterval = null;
+    var searchIntervalTablaAmigos = null;
     $(document).ready(function () {
         $.ajax(
             {
@@ -25,7 +28,7 @@
                 headers: { "token": token },
                 success : function (res) {
                     amigos = JSON.parse(res);
-                    listFriends();
+                    loadNumberOfMessages();
                 },
                 error : function (error) {
                     showNotification(error, "alert alert-danger");
@@ -34,19 +37,66 @@
         )
     });
 
+    var amigosCompleteInfo = [];
+
+    function loadNumberOfMessages() {
+        numberOfMessages();
+        if (searchIntervalTablaAmigos) clearInterval(searchIntervalTablaAmigos);
+        searchIntervalTablaAmigos = setInterval( () => numberOfMessages(), 2000 );
+    }
+
+    function numberOfMessages() {
+        amigosCompleteInfo = [];
+        for (i = 0; i < amigos.length; i++) {
+            $.ajax(
+                {
+                    url: URLbase + "/mensaje/numero",
+                    type: "POST",
+                    data: {
+                        amigo: amigos[i],
+                    },
+                    dataType: 'json',
+                    headers: {"token": token},
+                    success: function (res) {
+                        amigosCompleteInfo.push(JSON.parse(res));
+                        listFriends();
+                    },
+                    error: function (error) {
+                        showNotification(error, "alert alert-danger");
+                    }
+                }
+            )
+        }
+    }
+
+    function loadChat(email) {
+        $( "#panelChat" ).show();
+        changeSelectedFriend(email);
+    }
+
     function listFriends(){
         let myNode = document.getElementById("tableFriends");
         while (myNode.firstChild) {
             myNode.removeChild(myNode.lastChild);
         }
 
-        for (i = 0; i < amigos.length; i++) {
+        let numberOfMessages;
+        for (i = 0; i < amigosCompleteInfo.length; i++) {
+            numberOfMessages = amigosCompleteInfo[i].numberOfMessages || "Ningún";
             $("#tableFriends").append(
-                "<tr id=" + amigos[i]._id + " onClick=updateChat('"+amigos[i].email+"') >" +
-                "<td>" + amigos[i].name + " " + amigos[i].surname + "</td>" +
-                "<td>UnreadMessages</td>" +
+                "<tr id={" + amigosCompleteInfo[i]._id +"} onClick=loadChat('"+amigosCompleteInfo[i].email+"') >" +
+                "<td>" + amigosCompleteInfo[i].name + " " + amigosCompleteInfo[i].surname + "</td>" +
+                "<td>" + numberOfMessages + " mensaje(s) sin leer" + "</td>" +
                 "</tr>"
             );
         }
     }
+
+    function changeSelectedFriend(email) {
+        selectedFriend = email;
+        updateChat(selectedFriend);
+        if (searchInterval) clearInterval(searchInterval);
+        searchInterval = setInterval( () => updateChat(selectedFriend), 1000 );
+    }
+
 </script>
