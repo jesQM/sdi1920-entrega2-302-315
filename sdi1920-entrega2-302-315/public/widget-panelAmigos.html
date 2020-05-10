@@ -38,20 +38,25 @@
         )
     });
 
-    $('#filtro-amigo').on('input',function(e){
+    $('#filtro-amigo').on('input', () => {aplicarFiltroDeAmigos()});
+    function aplicarFiltroDeAmigos() {
         var filtro = [];
         var nombreFiltro = $("#filtro-amigo").val();
+        if (nombreFiltro.length == 0) {
+            listFriends(amigosCompleteInfo);
+            return;
+        }
 
-        for (i = 0; i < amigos.length; i++) {
-            if (amigos[i].name.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
-                || amigos[i].surname.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
-                || (amigos[i].name.toLowerCase() + " " + amigos[i].surname.toLowerCase()).indexOf(nombreFiltro.toLowerCase()) != -1)
+        for (i = 0; i < amigosCompleteInfo.length; i++) {
+            if (amigosCompleteInfo[i].name.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
+                || amigosCompleteInfo[i].surname.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
+                || (amigosCompleteInfo[i].name.toLowerCase() + " " + amigosCompleteInfo[i].surname.toLowerCase()).indexOf(nombreFiltro.toLowerCase()) != -1)
             {
-                filtro.push(amigos[i]);
+                filtro.push(amigosCompleteInfo[i]);
             }
         }
         listFriends(filtro);
-    });
+    }
   
     var amigosCompleteInfo = [];
 
@@ -75,7 +80,7 @@
                     headers: {"token": token},
                     success: function (res) {
                         amigosCompleteInfo.push(JSON.parse(res));
-                        listFriends(amigos);
+                        aplicarFiltroDeAmigos();
                     },
                     error: function (error) {
                         showNotification(error, "alert alert-danger");
@@ -97,11 +102,11 @@
         }
 
         let numberOfMessages;
-        for (i = 0; i < amigosCompleteInfo.length; i++) {
-            numberOfMessages = amigosCompleteInfo[i].numberOfMessages || "Ningún";
+        for (i = 0; i < friends.length; i++) {
+            numberOfMessages = friends[i].numberOfMessages || "Ningún";
             $("#tableFriends").append(
-                "<tr id={" + amigosCompleteInfo[i]._id +"} onClick=loadChat('"+amigosCompleteInfo[i].email+"') >" +
-                "<td>" + amigosCompleteInfo[i].name + " " + amigosCompleteInfo[i].surname + "</td>" +
+                "<tr id={" + friends[i]._id +"} onClick=loadChat('"+friends[i].email+"') >" +
+                "<td>" + friends[i].name + " " + friends[i].surname + "</td>" +
                 "<td>" + numberOfMessages + " mensaje(s) sin leer" + "</td>" +
                 "</tr>"
             );
