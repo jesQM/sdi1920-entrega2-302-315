@@ -17,6 +17,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import com.uniovi.tests.pageobjects.PO_Client_LoginView;
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
@@ -235,32 +236,40 @@ public class TestsJesus {
 	}
 	
 	
-	
-	//PR23. Sin hacer /
+	// [Prueba23] Inicio de sesión con datos válidos.
 	@Test
 	public void PR23() {
-		assertTrue("PR23 sin hacer", false);			
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		// Main View Loads
+		PO_View.checkElement(driver, "id", "widget-mainView");
 	}
 	
-	//PR24. Sin hacer /
+	// [Prueba24] Inicio de sesión con datos inválidos (usuario no existente en la aplicación).
 	@Test
 	public void PR24() {
-		assertTrue("PR24 sin hacer", false);			
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "noExisto", "niYoTampoco");
+		
+		// Error PopUps
+		PO_View.checkElement(driver, "class", "alert-danger");
 	}
 	
-	//PR25. Sin hacer /
+	// [Prueba25] Acceder a la lista de amigos de un usuario, que al menos tenga tres amigos.
 	@Test
 	public void PR25() {
 		assertTrue("PR25 sin hacer", false);			
 	}
 	
-	//PR26. Sin hacer /
+	// [Prueba26] Acceder a la lista de amigos de un usuario, y realizar un filtrado para encontrar a un amigo
+	//	concreto, el nombre a buscar debe coincidir con el de un amigo.
 	@Test
 	public void PR26() {
 		assertTrue("PR26 sin hacer", false);			
 	}
 	
-	//PR27. Sin hacer /
+	// [Prueba27] Acceder a la lista de mensajes de un amigo “chat”, la lista debe contener al menos tres mensajes.
 	@Test
 	public void PR27() {
 		assertTrue("PR27 sin hacer", false);			
