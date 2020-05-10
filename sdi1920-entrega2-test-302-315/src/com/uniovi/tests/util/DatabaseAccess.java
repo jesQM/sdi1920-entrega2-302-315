@@ -81,12 +81,11 @@ public class DatabaseAccess {
 		docs.add(doc);
 		if (accepted) {
 			Document otherWay = new Document();
-				doc.append("userFrom", new ObjectId(to));
-				doc.append("userTo", new ObjectId(from));
-				doc.append("accepted", accepted);
+				otherWay.append("userTo", new ObjectId(from));
+				otherWay.append("userFrom", new ObjectId(to));
+				otherWay.append("accepted", accepted);
 			docs.add(otherWay);
 		}
-		
 		collection.insertMany(docs);
 	}
 	

@@ -256,17 +256,75 @@ public class TestsJesus {
 		PO_View.checkElement(driver, "class", "alert-danger");
 	}
 	
+	// Inicio de sesión con datos inválidos (contraseña errónea).
+	@Test
+	public void PR24_2() {
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "estoEstáMal");
+		
+		// Error PopUps
+		PO_View.checkElement(driver, "class", "alert-danger");
+	}
+	
 	// [Prueba25] Acceder a la lista de amigos de un usuario, que al menos tenga tres amigos.
 	@Test
 	public void PR25() {
-		assertTrue("PR25 sin hacer", false);			
+		// 1.- Tres amigos al usuario
+/*		String to = DatabaseAccess.getUserIdFromEmail("pedro@email.com");
+		String from1 = DatabaseAccess.getUserIdFromEmail("ana@email.com");
+		String from2 = DatabaseAccess.getUserIdFromEmail("susana@email.com");
+		String from3 = DatabaseAccess.getUserIdFromEmail("jose@email.com");
+		DatabaseAccess.removeFriendship(to, from1);
+		DatabaseAccess.removeFriendship(to, from2);
+		DatabaseAccess.removeFriendship(to, from3);
+		DatabaseAccess.createFriendship(to, from1, true);
+		DatabaseAccess.createFriendship(to, from2, true);
+		DatabaseAccess.createFriendship(to, from3, true);
+*/		
+		// Login
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		// Que se muestren 3 amigos
+		PO_View.checkElement(driver, "id", "tableFriends");
+		PO_View.checkElement(driver, "text", "Ana Fernández"); // Name of one of the friends
+		List<WebElement> e = driver.findElements(By.xpath("//*[contains(@id,'tableFriends')]/tr"));
+		assertTrue(e.size() >= 3);
 	}
 	
 	// [Prueba26] Acceder a la lista de amigos de un usuario, y realizar un filtrado para encontrar a un amigo
 	//	concreto, el nombre a buscar debe coincidir con el de un amigo.
 	@Test
 	public void PR26() {
-		assertTrue("PR26 sin hacer", false);			
+		// 1.- Tres amigos al usuario
+/*		String to = DatabaseAccess.getUserIdFromEmail("pedro@email.com");
+		String from1 = DatabaseAccess.getUserIdFromEmail("ana@email.com");
+		String from2 = DatabaseAccess.getUserIdFromEmail("susana@email.com");
+		String from3 = DatabaseAccess.getUserIdFromEmail("jose@email.com");
+		DatabaseAccess.removeFriendship(to, from1);
+		DatabaseAccess.removeFriendship(to, from2);
+		DatabaseAccess.removeFriendship(to, from3);
+		DatabaseAccess.createFriendship(to, from1, true);
+		DatabaseAccess.createFriendship(to, from2, true);
+		DatabaseAccess.createFriendship(to, from3, true);
+*/		
+		// Login
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		
+		// Search
+		PO_View.checkElement(driver, "id", "tableFriends");
+		PO_View.checkElement(driver, "text", "Ana Fernández"); // Name of one of the friends
+		WebElement search = driver.findElement(By.id("filtro-amigo"));
+		search.click();
+		search.clear();
+		search.sendKeys("Susana");
+		
+		// Only 1 entry found
+		List<WebElement> e = driver.findElements(By.xpath("//*[contains(@id,'tableFriends')]/tr"));
+		assertTrue(e.size() == 1);
+		PO_View.checkElement(driver, "text", "Susana Martínez"); // Name buscado
 	}
 	
 	// [Prueba27] Acceder a la lista de mensajes de un amigo “chat”, la lista debe contener al menos tres mensajes.

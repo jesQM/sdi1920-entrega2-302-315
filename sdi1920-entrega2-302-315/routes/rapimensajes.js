@@ -39,20 +39,26 @@ module.exports = function(app, gestorBD) {
         };
         gestorBD.obtenerFriendship( criterio, (fr) => {
             if (fr) {
-                criterio = {
-                    $or : fr.map( (friendship) => {return { _id : gestorBD.mongo.ObjectID(friendship.userTo.toString())}} )
-                }
-                gestorBD.obtenerUsuarios(criterio, (amigos) => {
-                    if (amigos) {
-                        res.status(200);
-                        res.json(JSON.stringify(amigos));
-                    } else {
-                        res.status(500);
-                        res.json({
-                            error : "No se han podido cargar los amigos"
-                        });
+                if (fr.length == 0) {
+                    res.status(200);
+                    res.json(JSON.stringify([]));
+                } else {
+                    criterio = {
+                        $or : fr.map( (friendship) => {return { _id : gestorBD.mongo.ObjectID(friendship.userTo.toString())}} )
                     }
-                });
+                    console.log(criterio);
+                    gestorBD.obtenerUsuarios(criterio, (amigos) => {
+                        if (amigos) {
+                            res.status(200);
+                            res.json(JSON.stringify(amigos));
+                        } else {
+                            res.status(500);
+                            res.json({
+                                error : "No se han podido cargar los amigos"
+                            });
+                        }
+                    });
+                }
             } else {
                 res.status(500);
                 res.json({
