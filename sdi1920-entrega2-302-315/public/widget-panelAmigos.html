@@ -1,5 +1,6 @@
 
 <div id="widget-panelAmigos" style="background-color: lavender; ">
+    <input type="text" class="form-control" placeholder="Buscar amigo" id="filtro-amigo"/>
     <table class="table table-hover">
         <thead>
         <tr>
@@ -31,12 +32,27 @@
                     loadNumberOfMessages();
                 },
                 error : function (error) {
-                    showNotification(error, "alert alert-danger");
+                    showNotification(error.responseJSON.error, "alert alert-danger");
                 }
             }
         )
     });
 
+    $('#filtro-amigo').on('input',function(e){
+        var filtro = [];
+        var nombreFiltro = $("#filtro-amigo").val();
+
+        for (i = 0; i < amigos.length; i++) {
+            if (amigos[i].name.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
+                || amigos[i].surname.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
+                || (amigos[i].name.toLowerCase() + " " + amigos[i].surname.toLowerCase()).indexOf(nombreFiltro.toLowerCase()) != -1)
+            {
+                filtro.push(amigos[i]);
+            }
+        }
+        listFriends(filtro);
+    });
+  
     var amigosCompleteInfo = [];
 
     function loadNumberOfMessages() {
@@ -59,7 +75,7 @@
                     headers: {"token": token},
                     success: function (res) {
                         amigosCompleteInfo.push(JSON.parse(res));
-                        listFriends();
+                        listFriends(amigos);
                     },
                     error: function (error) {
                         showNotification(error, "alert alert-danger");
@@ -74,7 +90,7 @@
         changeSelectedFriend(email);
     }
 
-    function listFriends(){
+    function listFriends(friends){
         let myNode = document.getElementById("tableFriends");
         while (myNode.firstChild) {
             myNode.removeChild(myNode.lastChild);
@@ -98,5 +114,4 @@
         if (searchInterval) clearInterval(searchInterval);
         searchInterval = setInterval( () => updateChat(selectedFriend), 1000 );
     }
-
 </script>

@@ -17,6 +17,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import com.uniovi.tests.pageobjects.PO_Client_LoginView;
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
 import com.uniovi.tests.pageobjects.PO_NavView;
@@ -235,35 +236,128 @@ public class TestsJesus {
 	}
 	
 	
-	
-	//PR23. Sin hacer /
+	// [Prueba23] Inicio de sesión con datos válidos.
 	@Test
 	public void PR23() {
-		assertTrue("PR23 sin hacer", false);			
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		// Main View Loads
+		PO_View.checkElement(driver, "id", "widget-mainView");
 	}
 	
-	//PR24. Sin hacer /
+	// [Prueba24] Inicio de sesión con datos inválidos (usuario no existente en la aplicación).
 	@Test
 	public void PR24() {
-		assertTrue("PR24 sin hacer", false);			
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_Client_LoginView.fillForm(driver, "noExisto", "niYoTampoco");
+		
+		// Error PopUps
+		PO_View.checkElement(driver, "class", "alert-danger");
 	}
 	
-	//PR25. Sin hacer /
+	// Inicio de sesión con datos inválidos (contraseña errónea).
+	@Test
+	public void PR24_2() {
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "estoEstáMal");
+		
+		// Error PopUps
+		PO_View.checkElement(driver, "class", "alert-danger");
+	}
+	
+	// [Prueba25] Acceder a la lista de amigos de un usuario, que al menos tenga tres amigos.
 	@Test
 	public void PR25() {
-		assertTrue("PR25 sin hacer", false);			
+		// 1.- Tres amigos al usuario
+		String to = DatabaseAccess.getUserIdFromEmail("pedro@email.com");
+		String from1 = DatabaseAccess.getUserIdFromEmail("ana@email.com");
+		String from2 = DatabaseAccess.getUserIdFromEmail("susana@email.com");
+		String from3 = DatabaseAccess.getUserIdFromEmail("jose@email.com");
+		DatabaseAccess.removeFriendship(to, from1);
+		DatabaseAccess.removeFriendship(to, from2);
+		DatabaseAccess.removeFriendship(to, from3);
+		DatabaseAccess.createFriendship(to, from1, true);
+		DatabaseAccess.createFriendship(to, from2, true);
+		DatabaseAccess.createFriendship(to, from3, true);
+		
+		// Login
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		// Que se muestren 3 amigos
+		PO_View.checkElement(driver, "id", "tableFriends");
+		PO_View.checkElement(driver, "text", "Ana Fernández"); // Name of one of the friends
+		List<WebElement> e = driver.findElements(By.xpath("//*[contains(@id,'tableFriends')]/tr"));
+		assertTrue(e.size() >= 3);
 	}
 	
-	//PR26. Sin hacer /
+	// [Prueba26] Acceder a la lista de amigos de un usuario, y realizar un filtrado para encontrar a un amigo
+	//	concreto, el nombre a buscar debe coincidir con el de un amigo.
 	@Test
 	public void PR26() {
-		assertTrue("PR26 sin hacer", false);			
+		// 1.- Tres amigos al usuario
+		String to = DatabaseAccess.getUserIdFromEmail("pedro@email.com");
+		String from1 = DatabaseAccess.getUserIdFromEmail("ana@email.com");
+		String from2 = DatabaseAccess.getUserIdFromEmail("susana@email.com");
+		String from3 = DatabaseAccess.getUserIdFromEmail("jose@email.com");
+		DatabaseAccess.removeFriendship(to, from1);
+		DatabaseAccess.removeFriendship(to, from2);
+		DatabaseAccess.removeFriendship(to, from3);
+		DatabaseAccess.createFriendship(to, from1, true);
+		DatabaseAccess.createFriendship(to, from2, true);
+		DatabaseAccess.createFriendship(to, from3, true);
+		
+		// Login
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		// Search
+		PO_View.checkElement(driver, "id", "tableFriends");
+		PO_View.checkElement(driver, "text", "Ana Fernández"); // Name of one of the friends
+		WebElement search = driver.findElement(By.id("filtro-amigo"));
+		search.click();
+		search.clear();
+		search.sendKeys("Susana");
+		
+		// Only 1 entry found
+		List<WebElement> e = driver.findElements(By.xpath("//*[contains(@id,'tableFriends')]/tr"));
+		assertTrue(e.size() == 1);
+		PO_View.checkElement(driver, "text", "Susana Martínez"); // nombre buscado
 	}
 	
-	//PR27. Sin hacer /
+	// [Prueba27] Acceder a la lista de mensajes de un amigo “chat”, la lista debe contener al menos tres mensajes.
 	@Test
 	public void PR27() {
-		assertTrue("PR27 sin hacer", false);			
+		// 1.- Tres amigos al usuario
+		String to = DatabaseAccess.getUserIdFromEmail("pedro@email.com");
+		String from = DatabaseAccess.getUserIdFromEmail("susana@email.com");
+		DatabaseAccess.removeFriendship(to, from);
+		DatabaseAccess.createFriendship(to, from, true);
+		DatabaseAccess.writeMessage("pedro@email.com", "susana@email.com", "Hola Susana", false);
+		DatabaseAccess.writeMessage("pedro@email.com", "susana@email.com", "Qué tal te va?", false);
+		DatabaseAccess.writeMessage("susana@email.com", "pedro@email.com", "Me va muy bien", false);
+	
+		// Login
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_Client_LoginView.fillForm(driver, "pedro@email.com", "pedro1");
+		
+		// Friends load
+		PO_View.checkElement(driver, "id", "tableFriends");
+		PO_View.checkElement(driver, "text", "Susana Martínez");
+		
+		// Click on a friend
+		List<WebElement> e = driver.findElements(By.id(from));
+		e.get(0).click();
+		
+		e = driver.findElements(By.xpath("//*[contains(@id,'conversation')]/tr"));
+		assertTrue(e.size() >= 3); // Al menos 3 mensajes
 	}
 }
 

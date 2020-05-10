@@ -81,12 +81,11 @@ public class DatabaseAccess {
 		docs.add(doc);
 		if (accepted) {
 			Document otherWay = new Document();
-				doc.append("userFrom", new ObjectId(to));
-				doc.append("userTo", new ObjectId(from));
-				doc.append("accepted", accepted);
+				otherWay.append("userTo", new ObjectId(from));
+				otherWay.append("userFrom", new ObjectId(to));
+				otherWay.append("accepted", accepted);
 			docs.add(otherWay);
 		}
-		
 		collection.insertMany(docs);
 	}
 	
@@ -106,6 +105,18 @@ public class DatabaseAccess {
 				);
 		collection.deleteMany(bsonFilter);
 	}
+
+	public static void writeMessage(String emisor, String destino, String text, boolean leido) {
+		MongoDatabase db = getDatabase();
+		MongoCollection<Document> collection = db.getCollection("mensajes");
+		
+		Document doc = new Document();
+			doc.append("emisor", destino);
+			doc.append("destino", emisor);
+			doc.append("texto", text);
+			doc.append("leido", leido);
+		collection.insertOne(doc);
+  }
 	
 	public static int getNumberOfNonReadedMessages(String destino) {
 		MongoDatabase db = getDatabase();

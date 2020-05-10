@@ -71,15 +71,13 @@
                     updateView();
                 },
                 error : function (error) {
-                    showNotification(error, "alert alert-danger");
+                    showNotification(error.responseJSON.error, "alert alert-danger");
                 }
             }
         )
     }
     
     function updateView() {
-        console.log(messages);
-
         let myNode = document.getElementById("conversation");
         while (myNode.firstChild) {
             myNode.removeChild(myNode.lastChild);
