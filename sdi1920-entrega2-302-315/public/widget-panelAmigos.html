@@ -34,6 +34,11 @@
         )
     });
 
+    function loadChat(email) {
+        $( "#panelChat" ).show();
+        updateChat(email);
+    }
+
     function listFriends(){
         let myNode = document.getElementById("tableFriends");
         while (myNode.firstChild) {
@@ -42,11 +47,13 @@
 
         for (i = 0; i < amigos.length; i++) {
             $("#tableFriends").append(
-                "<tr id=" + amigos[i]._id + " onClick=updateChat('"+amigos[i].email+"') >" +
+                "<tr id={" + amigos[i]._id +"} onClick=loadChat('"+amigos[i].email+"') >" +
                 "<td>" + amigos[i].name + " " + amigos[i].surname + "</td>" +
                 "<td>UnreadMessages</td>" +
                 "</tr>"
             );
         }
+
+
     }
 </script>
