@@ -17,6 +17,7 @@
     var amigos = [];
     var selectedFriend = null;
     var searchInterval = null;
+    var searchIntervalTablaAmigos = null;
     $(document).ready(function () {
         $.ajax(
             {
@@ -40,8 +41,8 @@
 
     function loadNumberOfMessages() {
         numberOfMessages();
-        if (searchInterval) clearInterval(searchInterval);
-        searchInterval = setInterval( () => numberOfMessages(), 2000 );
+        if (searchIntervalTablaAmigos) clearInterval(searchIntervalTablaAmigos);
+        searchIntervalTablaAmigos = setInterval( () => numberOfMessages(), 2000 );
     }
 
     function numberOfMessages() {
