@@ -20,7 +20,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import com.uniovi.tests.pageobjects.PO_Client_LoginView;
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
-import com.uniovi.tests.pageobjects.PO_NavView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_View;
 import com.uniovi.tests.util.DatabaseAccess;
@@ -32,7 +31,8 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class TestsJesus {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "D:\\MiUsuario\\Escritorio\\EclipseStuff\\tercero\\SDI\\Labs\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+//	static String Geckdriver024 = "D:\\MiUsuario\\Escritorio\\EclipseStuff\\tercero\\SDI\\Labs\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "D:\\Users\\kendo\\Downloads\\PL-SDI-Sesion5\\geckodriver024win64.exe";
 	
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024); 
 	static String URL = "http://localhost:8081";
@@ -353,9 +353,11 @@ public class TestsJesus {
 		PO_View.checkElement(driver, "text", "Susana Martínez");
 		
 		// Click on a friend
-		List<WebElement> e = driver.findElements(By.id(from));
+//		List<WebElement> e = driver.findElements(By.id(from));
+		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"{"+ from +"}\"]/td[1]", 3);
 		e.get(0).click();
 		
+		SeleniumUtils.esperarSegundos(driver, 2);
 		e = driver.findElements(By.xpath("//*[contains(@id,'conversation')]/tr"));
 		assertTrue(e.size() >= 3); // Al menos 3 mensajes
 	}
