@@ -1,6 +1,7 @@
 package com.uniovi.tests.util;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
@@ -115,8 +116,9 @@ public class DatabaseAccess {
 			doc.append("destino", emisor);
 			doc.append("texto", text);
 			doc.append("leido", leido);
+			doc.append("fecha", new Date());
 		collection.insertOne(doc);
-  }
+	}
 	
 	public static int getNumberOfNonReadedMessages(String destino) {
 		MongoDatabase db = getDatabase();

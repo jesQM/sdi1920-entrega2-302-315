@@ -37,26 +37,6 @@
             }
         )
     });
-
-    $('#filtro-amigo').on('input', () => {aplicarFiltroDeAmigos()});
-    function aplicarFiltroDeAmigos() {
-        var filtro = [];
-        var nombreFiltro = $("#filtro-amigo").val();
-        if (nombreFiltro.length == 0) {
-            listFriends(amigosCompleteInfo);
-            return;
-        }
-
-        for (i = 0; i < amigosCompleteInfo.length; i++) {
-            if (amigosCompleteInfo[i].name.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
-                || amigosCompleteInfo[i].surname.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
-                || (amigosCompleteInfo[i].name.toLowerCase() + " " + amigosCompleteInfo[i].surname.toLowerCase()).indexOf(nombreFiltro.toLowerCase()) != -1)
-            {
-                filtro.push(amigosCompleteInfo[i]);
-            }
-        }
-        listFriends(filtro);
-    }
   
     var amigosCompleteInfo = [];
 
@@ -80,7 +60,8 @@
                     headers: {"token": token},
                     success: function (res) {
                         amigosCompleteInfo.push(JSON.parse(res));
-                        aplicarFiltroDeAmigos();
+                        // aplicarFiltroDeAmigos();
+                        ordenarPorFecha();
                     },
                     error: function (error) {
                         showNotification(error.responseJSON.error, "alert alert-danger");
@@ -88,6 +69,37 @@
                 }
             )
         }
+    }
+
+    //ordenar por fecha: de más reciente a más antiguo
+    function ordenarPorFecha() {
+        amigosCompleteInfo.sort(function(a,b){
+            console.log(a);
+            console.log(b);
+
+            return new Date(b.lastMessageDate) - new Date(a.lastMessageDate);
+        });
+        aplicarFiltroDeAmigos();
+    }
+
+    $('#filtro-amigo').on('input', () => {aplicarFiltroDeAmigos()});
+    function aplicarFiltroDeAmigos() {
+        var filtro = [];
+        var nombreFiltro = $("#filtro-amigo").val();
+        if (nombreFiltro.length == 0) {
+            listFriends(amigosCompleteInfo);
+            return;
+        }
+
+        for (i = 0; i < amigosCompleteInfo.length; i++) {
+            if (amigosCompleteInfo[i].name.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
+                || amigosCompleteInfo[i].surname.toLowerCase().indexOf(nombreFiltro.toLowerCase()) != -1
+                || (amigosCompleteInfo[i].name.toLowerCase() + " " + amigosCompleteInfo[i].surname.toLowerCase()).indexOf(nombreFiltro.toLowerCase()) != -1)
+            {
+                filtro.push(amigosCompleteInfo[i]);
+            }
+        }
+        listFriends(filtro);
     }
 
     function loadChat(email) {

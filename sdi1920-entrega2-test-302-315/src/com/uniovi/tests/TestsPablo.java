@@ -1,5 +1,6 @@
 package com.uniovi.tests;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.UUID;
@@ -342,6 +343,9 @@ public class TestsPablo {
 		SeleniumUtils.esperarSegundos(driver, 2);
 		SeleniumUtils.textoPresentePagina(driver, text1);
 		
+		List<WebElement> e = driver.findElements(By.xpath("//*[contains(@id,'conversation')]/tr"));
+		assertTrue(e.size() >= 1); 
+		
 		SeleniumUtils.clickLinkByHref(driver, "home");
 		
 		SeleniumUtils.clickLinkByHref(driver, "cliente");
@@ -382,6 +386,9 @@ public class TestsPablo {
 		SeleniumUtils.textoPresentePagina(driver, text2);
 		SeleniumUtils.textoPresentePagina(driver, text3);
 		
+		List<WebElement> e = driver.findElements(By.xpath("//*[contains(@id,'conversation')]/tr"));
+		assertTrue(e.size() >= 3); 
+		
 		SeleniumUtils.clickLinkByHref(driver, "home");
 		
 		SeleniumUtils.clickLinkByHref(driver, "cliente");
@@ -391,6 +398,71 @@ public class TestsPablo {
 		SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
 		SeleniumUtils.textoPresentePagina(driver, String.valueOf(DatabaseAccess.getNumberOfNonReadedMessages("dummy2@email.com")));
 		
+	}
+	
+	//PR31. Identificarse con un usuario A que al menos tenga 3 amigos, ir al chat del ultimo amigo de
+	//		la lista y enviarle un mensaje, volver a la lista de amigos y comprobar que el usuario al que se le ha enviado
+	//		el mensaje esta en primera posición. Identificarse con el usuario B y enviarle un mensaje al usuario A.
+	//		Volver a identificarse con el usuario A y ver que el usuario que acaba de mandarle el mensaje es el primero
+	//		en su lista de amigos.
+	@Test
+	public void PR31() {
+		String to = DatabaseAccess.getUserIdFromEmail("dummy3@email.com");
+		String from1 = DatabaseAccess.getUserIdFromEmail("dummy4@email.com");
+		String from2 = DatabaseAccess.getUserIdFromEmail("dummy5@email.com");
+		String from3 = DatabaseAccess.getUserIdFromEmail("dummy6@email.com");
+		DatabaseAccess.removeFriendship(to, from1);
+		DatabaseAccess.removeFriendship(to, from2);
+		DatabaseAccess.removeFriendship(to, from3);
+		DatabaseAccess.createFriendship(to, from1, true);
+		DatabaseAccess.createFriendship(to, from2, true);
+		DatabaseAccess.createFriendship(to, from3, true);
+		
+		DatabaseAccess.writeMessage("dummy3@email.com", "dummy4@email.com", "Hola", false);
+		DatabaseAccess.writeMessage("dummy3@email.com", "dummy5@email.com", "Hola", false);
+		DatabaseAccess.writeMessage("dummy3@email.com", "dummy6@email.com", "Hola", false);
+		
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy3@email.com", "dummy3");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		// enviamos un mensaje al último amigo (dummy4)
+		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, "/html/body/div[2]/div/div/div[1]/div/table/tbody/tr[3]/td[1]", 3);
+		users.get(0).click();
+		String text1 = "Mensaje PR31 para Dummy4";
+		PO_Client_ChatView.fillForm(driver, text1);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		SeleniumUtils.textoPresentePagina(driver, text1);
+		
+		// comprobamos que dummy4 ahora es el primero
+		List<WebElement> users2 = SeleniumUtils.EsperaCargaPaginaxpath(driver, "/html/body/div[2]/div/div/div[1]/div/table/tbody/tr[1]/td[1]", 3);
+		users2.get(0).click();
+		SeleniumUtils.textoPresentePagina(driver,"Chat con dummy4@email.com");
+		
+		// nos identificamos con dummy4
+		SeleniumUtils.clickLinkByHref(driver, "home");
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy4@email.com", "dummy4");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		// enviamos un mensaje a dummy3
+		users = SeleniumUtils.EsperaCargaPaginaxpath(driver, "/html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		users.get(0).click();
+		String text2 = "Mensaje PR31 para Dummy3";
+		PO_Client_ChatView.fillForm(driver, text2);
+		SeleniumUtils.esperarSegundos(driver, 2);
+		SeleniumUtils.textoPresentePagina(driver, text2);
+		
+		// nos identificamos de nuevo con dummy3
+		SeleniumUtils.clickLinkByHref(driver, "home");
+		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		PO_Client_LoginView.fillForm(driver, "dummy3@email.com", "dummy3");
+		PO_View.checkElement(driver, "id", "tableFriends");
+		
+		// comprobamos que dummy4 ahora es el primero
+		users2 = SeleniumUtils.EsperaCargaPaginaxpath(driver, "/html/body/div[2]/div/div/div[1]/div/table/tbody/tr[1]/td[1]", 3);
+		users2.get(0).click();
+		SeleniumUtils.textoPresentePagina(driver,"Chat con dummy4@email.com");
 	}
 		
 }
