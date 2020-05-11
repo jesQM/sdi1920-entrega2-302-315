@@ -353,11 +353,10 @@ public class TestsJesus {
 		PO_View.checkElement(driver, "text", "Susana Martínez");
 		
 		// Click on a friend
-//		List<WebElement> e = driver.findElements(By.id(from));
-		List<WebElement> e = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[@id=\"{"+ from +"}\"]/td[1]", 3);
+		List<WebElement> e = driver.findElements(By.xpath("//*[contains(@id,'{" + from + "}')]/td"));
 		e.get(0).click();
-		
-		SeleniumUtils.esperarSegundos(driver, 2);
+
+		PO_View.checkElement(driver, "text", "Qué tal te va?");
 		e = driver.findElements(By.xpath("//*[contains(@id,'conversation')]/tr"));
 		assertTrue(e.size() >= 3); // Al menos 3 mensajes
 	}
