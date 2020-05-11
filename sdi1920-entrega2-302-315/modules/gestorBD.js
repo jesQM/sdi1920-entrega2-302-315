@@ -166,6 +166,30 @@ module.exports = {
             }
         });
     },
+    obtenerFechaUltimoMensaje : function(criterio, funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('mensajes');
+                collection.find(criterio).toArray(function(err, mensajes) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        // funcionCallback(mensajes);
+                        // console.log(mensajes[mensajes.length - 1].fecha)
+                        if(mensajes[mensajes.length - 1]){
+                            funcionCallback(mensajes[mensajes.length - 1].fecha);
+                        } else {
+                            funcionCallback(null);
+                        }
+
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
     marcarLeidoMensajes : function(criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
             if (err) {

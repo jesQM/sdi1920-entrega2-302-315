@@ -75,6 +75,7 @@ module.exports = function(app, gestorBD) {
             destino : req.body.destino, // email destino
             texto : req.body.texto,
             leido : false,
+            fecha: new Date(),
         };
 
         let criterio = { $or : [
@@ -146,7 +147,7 @@ module.exports = function(app, gestorBD) {
                 // console.log(conversacion);
                 gestorBD.obtenerMensajes(conversacion, (msgs) => {
                     if (msgs) {
-                        console.log(msgs);
+                        // console.log(msgs);
                         res.status(200);
                         res.json(JSON.stringify(msgs));
                     } else {
@@ -179,7 +180,18 @@ module.exports = function(app, gestorBD) {
         gestorBD.obtenerNumeroMensajes(criterio, (numeroMensajes) => {
                 res.status(200);
                 amigo.numberOfMessages = numeroMensajes;
-                res.json(JSON.stringify(amigo));
+                // res.json(JSON.stringify(amigo));
+
+                var criterioFecha = {
+                    $or : [
+                        { emisor : res.usuario.email, destino : amigo.email },
+                        { emisor : amigo.email, destino : res.usuario.email },
+                    ]
+                };
+                gestorBD.obtenerFechaUltimoMensaje(criterioFecha, (fecha) => {
+                    amigo.lastMessageDate = fecha;
+                    res.json(JSON.stringify(amigo));
+                });
         });
 
     });
