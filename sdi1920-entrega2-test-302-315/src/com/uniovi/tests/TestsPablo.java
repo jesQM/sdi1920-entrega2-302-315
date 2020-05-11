@@ -312,6 +312,7 @@ public class TestsPablo {
 	@Test
 	public void PR28() {
 		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		SeleniumUtils.esperarSegundos(driver, 2);
 		PO_Client_LoginView.fillForm(driver, "dummy1@email.com", "dummy1");
 		PO_View.checkElement(driver, "id", "tableFriends");
 		
@@ -423,6 +424,7 @@ public class TestsPablo {
 		DatabaseAccess.writeMessage("dummy3@email.com", "dummy6@email.com", "Hola", false);
 		
 		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		SeleniumUtils.esperarSegundos(driver, 2);
 		PO_Client_LoginView.fillForm(driver, "dummy3@email.com", "dummy3");
 		PO_View.checkElement(driver, "id", "tableFriends");
 		
@@ -437,11 +439,13 @@ public class TestsPablo {
 		// comprobamos que dummy4 ahora es el primero
 		List<WebElement> users2 = SeleniumUtils.EsperaCargaPaginaxpath(driver, "/html/body/div[2]/div/div/div[1]/div/table/tbody/tr[1]/td[1]", 3);
 		users2.get(0).click();
+		SeleniumUtils.esperarSegundos(driver, 2);
 		SeleniumUtils.textoPresentePagina(driver,"Chat con dummy4@email.com");
 		
 		// nos identificamos con dummy4
 		SeleniumUtils.clickLinkByHref(driver, "home");
 		SeleniumUtils.clickLinkByHref(driver, "cliente");
+		SeleniumUtils.esperarSegundos(driver, 2);
 		PO_Client_LoginView.fillForm(driver, "dummy4@email.com", "dummy4");
 		PO_View.checkElement(driver, "id", "tableFriends");
 		
@@ -462,6 +466,7 @@ public class TestsPablo {
 		// comprobamos que dummy4 ahora es el primero
 		users2 = SeleniumUtils.EsperaCargaPaginaxpath(driver, "/html/body/div[2]/div/div/div[1]/div/table/tbody/tr[1]/td[1]", 3);
 		users2.get(0).click();
+		SeleniumUtils.esperarSegundos(driver, 2);
 		SeleniumUtils.textoPresentePagina(driver,"Chat con dummy4@email.com");
 	}
 		
