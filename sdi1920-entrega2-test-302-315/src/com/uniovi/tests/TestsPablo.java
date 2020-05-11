@@ -399,6 +399,8 @@ public class TestsPablo {
 		SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
 		SeleniumUtils.textoPresentePagina(driver, String.valueOf(DatabaseAccess.getNumberOfNonReadedMessages("dummy2@email.com")));
 		
+		DatabaseAccess.removeMessage("dummy1@email.com", "dummy2@email.com");
+		
 	}
 	
 	//PR31. Identificarse con un usuario A que al menos tenga 3 amigos, ir al chat del ultimo amigo de
@@ -468,6 +470,10 @@ public class TestsPablo {
 		users2.get(0).click();
 		SeleniumUtils.esperarSegundos(driver, 2);
 		SeleniumUtils.textoPresentePagina(driver,"Chat con dummy4@email.com");
+		
+		DatabaseAccess.removeMessage("dummy3@email.com", "dummy4@email.com");
+		DatabaseAccess.removeMessage("dummy3@email.com", "dummy5@email.com");
+		DatabaseAccess.removeMessage("dummy3@email.com", "dummy6@email.com");
 	}
 		
 }

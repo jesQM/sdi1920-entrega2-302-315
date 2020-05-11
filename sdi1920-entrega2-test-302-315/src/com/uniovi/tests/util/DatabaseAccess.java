@@ -106,6 +106,23 @@ public class DatabaseAccess {
 				);
 		collection.deleteMany(bsonFilter);
 	}
+	
+	public static void removeMessage(String from, String to) {
+		MongoDatabase db = getDatabase();
+		MongoCollection<Document> collection = db.getCollection("mensajes");
+		Bson bsonFilter = 
+				Filters.or(
+					Filters.and( // One way
+						Filters.eq("origen", (from)), 
+						Filters.eq("userdestino", (to))
+					),
+					Filters.and( // The other way
+							Filters.eq("origen", (to)), 
+							Filters.eq("destino", (from))
+					)
+				);
+		collection.deleteMany(bsonFilter);
+	}
 
 	public static void writeMessage(String emisor, String destino, String text, boolean leido) {
 		MongoDatabase db = getDatabase();
